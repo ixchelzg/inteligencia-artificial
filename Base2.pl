@@ -1,6 +1,39 @@
-consult('/home/ixchel/git/UNAM/IA/Manejo_de_archivos/main.pl').
+:- initialization(main,after_load).
+
 :- op(15, xfx, '=>').
 =>(X,Y).
+
+checaglobal:-
+	b_getval(dataBase, XXX),
+	write(XXX).
+
+functor(database, Array, 0).
+
+new_global_array(Array) :-
+	functor(database, Array, 0),
+	b_setval(database, Array).
+
+new_global_array(Name, Size) :-
+	functor(Array, array, Size),
+	b_setval(Name, Array).
+
+global_array_set(Name, Value) :-
+	b_getval(Name, Array),
+	b_setval(Name, Value),
+	write(Value).
+
+
+main:-
+	consult('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/main.pl'),
+	open_kb('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/bd.txt',KB),
+	new_global_array(dataBase, 0),
+	global_array_set(dataBase,KB).
+
+guardarBD(KB):-
+	save_kb('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/bd.txt',KB),
+	write('KB: '),
+	write(KB).
+
 primertermino(X,Y):- X = W=>Z, Y=W.
 segundotermino(X,Y):- X = W=>Z, Y=Z.
 valor(X,[],Y):- fail.
@@ -33,18 +66,6 @@ clase(pinguino, ave, [movimiento=>nada],[come=>pez],[]).
 clase(huachinango, pez, [sabor=>delicioso],[],[]).
 clase('pez volador', pez, [movimiento=>vuela],[come=>gusano],[flippy]).
 individuo(flippy, [fama=>mucha]).
-
-[
-[nombre=>animal, padre=>top, 
-[vida=>finita, ojos=>2],
-[odia=>pinguino],
-[[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]], 
-[individuo=>gusano, [ojos=>0, movimiento=>arrastra],[]]]]
-,
-.
-.
-.
-]
 
 rb(Y):- Y = [clase(animal, top,[vida=>finita, ojos=>2], [], ['estrella de mar', gusano]),
 individuo('estrella de mar',[ojos=>0, movimiento=>arrastra]),
