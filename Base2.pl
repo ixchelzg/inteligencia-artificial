@@ -1,5 +1,4 @@
-:- initialization(main,after_load).
-
+:- initialization(main).
 :- op(15, xfx, '=>').
 =>(X,Y).
 
@@ -83,3 +82,5 @@ clasesHijasRecursivoCola([H|T],Y):-
 							clasesHijasRecursivoCabeza(H,S),
 							clasesHijasRecursivoCola(T,M),
 							append(S,M,Y).
+
+
