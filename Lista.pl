@@ -102,27 +102,20 @@ sacaObjetosHijosDeClase(X,[H|T],Y):-
 								sacaIndividuosDeClase(H,Y),!;
 								sacaObjetosHijosDeClase(X,T,Y),!.
 
+								
+								
+								
+sacaObjetosHijosDeClaseRecursivoInicioFlat(X,Y):- sacaObjetosHijosDeClaseRecursivoInicio(X,Z), flatten(Z,Y).
+
 sacaObjetosHijosDeClaseRecursivoInicio(X,Y):-
 								sacaClasesHijasRecursivoInicioFlat(X,S), 
-								write('S: '),
-								write(S),
-								nl,
-								cabeza(S,U),
-								write('U: '),
-								write(U),
-								nl,
-								sacaObjetosHijosDeClaseRecursivo(X,S,Y).
-
-
-
+								sacaObjetosHijosDeClaseRecursivo(X,S,Y),!.
 
 sacaObjetosHijosDeClaseRecursivo(X,[],Y):- Y=[].						
-sacaObjetosHijosDeClaseRecursivo(X,[],Y):- 	
-								
-								write('S: '),
-								write(S),
-								nl
-								.
+sacaObjetosHijosDeClaseRecursivo(X,[H|T],Y):- 	
+								sacaObjetosHijosDeClaseInicio(H,F),
+								sacaObjetosHijosDeClaseRecursivo(X,T,G),
+								anade(F,G,Y),!.
 
 
 
