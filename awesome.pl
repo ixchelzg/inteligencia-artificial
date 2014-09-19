@@ -12,16 +12,18 @@
 
 
 carga :-  %con consult se carga la base de conocimientos en la memoria
-	consult('basePruebaCrearBorrar.pl'),
-	awesome.
+	see('basePruebaCrearBorrar.pl'), read(X),
+	write(X).
+	%awesome.
 
 awesome :- 
-	write('Escribe un Paiis? '),
-	read(Pais), % read lee desde la consola pero no es necesario para el proyecto
-	respuesta(Pais).
+	write('Esta es la lista que ya se lee: '), write(X), nl,
+	write('Escribe elimia. o agrega.'),
+	read(Opcion), % read lee desde la consola pero no es necesario para el proyecto
+	respuesta(Opcion).
 
 respuesta(elimina) :-
-	write('Por favor, dime cual quieres eliminar.'), nl,
+	write('Por favor, dime cual quieres eliminar. '), write(X), nl,
 	read(Pais),
 	eliminando(Pais).
 
