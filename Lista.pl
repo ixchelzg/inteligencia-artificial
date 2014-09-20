@@ -197,7 +197,43 @@ sacaClasesPadreDeUnaClase(X,[H|T],Y):- cabeza(H,Z),
 										sacaClasesPadreDeUnaClase(X,T,Y),
 										!.
 
+sacaClasePorNombre(X,[],Y).
+sacaClasePorNombreInicio(X,Y):-rb(W), sacaClasePorNombre(X,W,Y).
+sacaClasePorNombre(X,[H|T],Y):- sacaNombreDeClase(H,Z), X == Z , Y = H,!; sacaClasePorNombre(X,T,Y).
 
+sacaIndividuoDeListaDeIndividuos(X,[],Y):- Y = [].
+sacaIndividuoDeListaDeIndividuos(X,[H|T],Y):-
+								cabeza(H,W),
+								segundotermino(W,L),
+								X==L,
+								Y=H,!;
+sacaIndividuoDeListaDeIndividuos(X,T,Y),!.
+
+sacaPropiedadesDeIndividuo([H|T],Y):- 
+
+
+%sacalaspropiedadesIncluidasLasHeredadasDeUnIndividuo(X,Y):-
+%encuentraClaseDeIndividuoInicio(X,Z),
+%sacaListaIndividuosDeClase(Z,W),
+%sacaIndividuoDeListaDeIndividuos(W,S),
+
+%sacaLasPropiedadesDeClasesPadreParaIndividuoInicioFlat(X,Y),
+
+
+
+
+
+
+
+sacaLasPropiedadesDeClasesPadreParaIndividuoInicioFlat(X,Y):-sacaLasPropiedadesDeClasesPadreParaIndividuoInicio(X,Z), flatten(Z,Y).
+sacaLasPropiedadesDeClasesPadreParaIndividuoInicio(X,Y):-encuentraClasesALasQuePerteneceUnIndividuo(X,W),
+sacaLasPropiedadesDeClasesPadreParaIndividuo(X,W,Y).
+sacaLasPropiedadesDeClasesPadreParaIndividuo(X,[],Y).
+sacaLasPropiedadesDeClasesPadreParaIndividuo(X,[H|T],Y):- sacaClasePorNombreInicio(H,Z), 
+								sacaPropiedadesDeClase(Z,S), 
+								sacaLasPropiedadesDeClasesPadreParaIndividuo(X,T,R), 
+								anade(S,R,Y), 
+								!. 
 rli(Y):- Y = [
 		[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]], 
 		[individuo=>gusano, [ojos=>0, movimiento=>arrastra],[]]
