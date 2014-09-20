@@ -102,14 +102,39 @@ sacaObjetosHijosDeClase(X,[H|T],Y):-
 								sacaIndividuosDeClase(H,Y),!;
 								sacaObjetosHijosDeClase(X,T,Y),!.
 
-								
-								
+
+sacaNombreDeClase([H|T],Y):- segundotermino(H,Y), !.
+sacaPadreDeClase([H|T],Y):- cabeza(T,Z), segundotermino(Z,Y), !.
+sacaPropiedadesDeClase([H|T],Y):- cola(T,Z), cabeza(Z,Y), !.
+sacaRelacionesDeClase([H|T],Y):- cola(T,L), cola(L,P), cabeza(P,Y), !.
+sacaListaIndividuosDeClase([H|T],Y):- cola(T,L), cola(L,P), cola(P,M), cabeza(M,Y), !.
+																	
+encuentraClaseDeIndividuoInicio(X,Y):- rb(W), encuentraClaseDeIndividuo(X,W,Y).	
+encuentraClaseDeIndividuo(X,[H|T],Y):-  
+										sacaListaIndividuosDeClase(H,N),
+										cabeza(N,V),
+										cabeza(V,I),
+										cabeza(I,F),
+										segundotermino(F,A),
+										write('A: '), write(A), nl,
+										X == A,
+										write('Encontrado'), nl,
+										cabeza(H,Q),
+										segundotermino(Q,Y),!
+										;
+										encuentraClaseDeIndividuo(X,T,Y)
+										.
 								
 sacaObjetosHijosDeClaseRecursivoInicioFlat(X,Y):- sacaObjetosHijosDeClaseRecursivoInicio(X,Z), flatten(Z,Y).
 
 sacaObjetosHijosDeClaseRecursivoInicio(X,Y):-
 								sacaClasesHijasRecursivoInicioFlat(X,S), 
 								sacaObjetosHijosDeClaseRecursivo(X,S,Y),!.
+sacaObjetosHijosDeClaseRecursivo(X,[],Y):- Y=[].						
+sacaObjetosHijosDeClaseRecursivo(X,[H|T],Y):- 	
+								sacaObjetosHijosDeClaseInicio(H,F),
+								sacaObjetosHijosDeClaseRecursivo(X,T,G),
+								anade(F,G,Y),!.
 
 sacaObjetosHijosDeClaseRecursivo(X,[],Y):- Y=[].						
 sacaObjetosHijosDeClaseRecursivo(X,[H|T],Y):- 	
@@ -117,9 +142,66 @@ sacaObjetosHijosDeClaseRecursivo(X,[H|T],Y):-
 								sacaObjetosHijosDeClaseRecursivo(X,T,G),
 								anade(F,G,Y),!.
 
+iteraPropiedades([],Y).
+iteraPropiedades([H|T],Y):- 
+								cabeza(H,S),
+								segundotermino(S,M),
+								iteraIndividuos(T,R),
+								anade(M,R,Y),!.
+								
+sacaPropiedadesDirectasDeClaseInicio(X,Y):- rc(X), sacaPropiedadesDirectasDeClase(X,Y).
+sacaPropiedadesDirectasDeClase([],Y).
+sacaPropiedadesDirectasDeClase([H|T],Y):-
+								cola(T,R),
+								cabeza(R,Y),!.
+
+								
+sacaPropiedadesDirectasDeIndividuoInicio(X,Y):- ri(X), sacaPropiedadesDirectasDeIndividuo(X,Y).
+sacaPropiedadesDirectasDeIndividuo([],Y).
+sacaPropiedadesDirectasDeIndividuo([H|T],Y):-
+								write('T: '),
+								write(T),
+								nl,
+								cabeza(T,Y),								
+								write('Y: '),
+								write(Y),
+								nl,!.
+
+
+sacaIndividuosYClasesHijasDeUnaClaseInicioFlat(X,Y):- sacaIndividuosYClasesHijasDeUnaClaseInicio(X,Z), flatten(Z,Y).
+								
+sacaIndividuosYClasesHijasDeUnaClaseInicio(X,Y):- sacaClasesHijasRecursivoInicioFlat(X,Z), sacaObjetosHijosDeClaseRecursivoInicioFlat(X,W), anade(Z,W,Y), !.
 
 
 
+sacaClasesPadreDeUnaClase(X,[],Y).
+sacaClasesPadreDeUnaClaseInicio(X,Y):- rb(W), sacaClasesPadreDeUnaClase(X,W,Y).
+sacaClasesPadreDeUnaClase(X,[H|T],Y):- cabeza(H,Z),
+										cabeza(Z,R),
+										segundotermino(R,M),
+										X == M,
+										cola(H,U),
+										cabeza(U,L),
+										segundotermino(L,K),
+										sacaClasesPadreDeUnaClaseInicio(K,W),
+										K \= top,
+										anade(K,W,Y),
+										!;
+										sacaClasesPadreDeUnaClase(X,T,Y),
+										!.
+
+								
+
+ri(Y):- Y =	[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]].						
+								
+rc(Y):- Y = [nombre=>animal, padre=>top, 
+	[vida=>finita, ojos=>2],
+	[odia=>pinguino],
+	[
+		[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]], 
+		[individuo=>gusano, [ojos=>0, movimiento=>arrastra],[]]
+	]
+	].
 								
 rb(Y):- Y = [
 	[nombre=>animal, padre=>top, 

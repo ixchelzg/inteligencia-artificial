@@ -1,0 +1,59 @@
+sacaClasesPadreDeUnaClaseInicio(X,Y):- rb(W), sacaClasesPadreDeUnaClase(X,W,Y).
+sacaClasesPadreDeUnaClase(X,[H|T],Y):- cabeza(T,Z),
+										write('Z: '),
+										write(Z),
+										nl,
+										cabeza(Z,R),
+										write('R: '),
+										write(R),
+										nl,
+										segundotermino(R,M),
+										write('M: '),
+										write(M),
+										nl,
+										X == M,
+										
+										write('Encontrado '),
+										nl,!;
+										sacaClasesPadreDeUnaClase(X,T,Y)
+										,!.
+										
+										
+										sacaClasesPadreDeUnaClaseInicio(X,Y):- rb(W), sacaClasesPadreDeUnaClase(X,W,Y).
+sacaClasesPadreDeUnaClase(X,[H|T],Y):- cabeza(H,Z),
+										write('H: '),
+										write(H),
+										nl,	
+										write('T: '),
+										write(T),
+										nl,
+										write('Z: '),
+										write(Z),
+										nl,
+										cabeza(Z,R),
+										write('R: '),
+										write(R),
+										nl,
+										segundotermino(R,M),
+										write('M: '),
+										write(M),
+										nl,
+										X == M,
+										write('Encontrado '),
+										nl,
+										cola(H,U),
+										write('U: '),
+										write(U),
+										nl,
+										cabeza(U,L),
+										write('L: '),
+										write(L),
+										nl,
+										segundotermino(L,K),
+										write('K: '),
+										write(K),
+										nl,
+										sacaClasesPadreDeUnaClaseInicio(K,Y)
+										!;
+										sacaClasesPadreDeUnaClase(X,T,Y)
+										,!.
