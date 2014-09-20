@@ -175,6 +175,18 @@ eliminaPropiedad(X,Y):-
 		crearNuevaListaIndProps(X,Y,W,W)
 	).
 
+
+eliminaRelacion(X,Y):-
+	(
+		rb(W),
+		MM=[nombre=>Y,_,_,_,_],
+		quieroPadre(MM,W,P),
+		crearNuevaListaRels(P,X)
+	);(
+		rb(W),
+		crearNuevaListaIndRels(X,Y,W,W)
+	).
+
 crearNuevaListaProps(X,Y):-
 	nth0(0,X,N),
 	nth0(1,X,P),
@@ -208,9 +220,47 @@ crearNuevaListaIndDeepProps(X,Y,Lw,Inds,[H|T]):-
 		rb(W),
 		sus(H,H1,Inds,S),
 		sus(Inds,S,Lw,S1),
-		eliminaClase(Inds,Lw,LL),
-		concatenar(LL,S,L2),
-		sus(Lw,L2,W,STs),
+		sus(Lw,S1,W,STs),
+		guardarBD(STs)
+	)
+	;
+	crearNuevaListaIndDeepProps(X,Y,Lw,Inds,T).
+
+
+crearNuevaListaRels(X,Y):-
+	nth0(0,X,N),
+	nth0(1,X,P),
+	nth0(2,X,Props),
+	nth0(3,X,Rels),
+	nth0(4,X,Inds),
+	PB= Y=>XX,
+	eliminaClase(PB,Rels,P1),
+	H1=[N,P,Props,P1,Inds],
+	rb(W),
+	sus(X,H1,W,S),
+	guardarBD(S).
+
+crearNuevaListaIndRels(X,Y,W,[]).
+crearNuevaListaIndRels(X,Y,W,[H|T]):-
+	nth0(4,H,Inds),
+	crearNuevaListaIndDeepRels(X,Y,H,Inds,Inds),
+	crearNuevaListaIndRels(X,Y,W,T).
+
+crearNuevaListaIndDeepRels(X,Y,Lw,Inds,[]).
+crearNuevaListaIndDeepRels(X,Y,Lw,Inds,[H|T]):-
+	(
+		RR= X=>XX,
+		valor(individuo,H,Y),
+		nth0(0,H,Nm),
+		nth0(1,H,Props),
+		nth0(2,H,Rels),
+		member(RR,Rels),
+		eliminaClase(RR,Rels,LP),
+		H1=[Nm,Props,LP],
+		rb(W),
+		sus(H,H1,Inds,S),
+		sus(Inds,S,Lw,S1),
+		sus(Lw,S1,W,STs),
 		guardarBD(STs)
 	)
 	;
