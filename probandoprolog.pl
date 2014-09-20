@@ -31,7 +31,7 @@ quieroClase(X,[H|T],P):-
 	nth0(2,H,Props),
 	cabeza(Props,S),
 	segundoTermino(S,X),
-	P=H,!;
+	P=H;
 	quieroClase(X,T,P).
 
 elimina(X):-
@@ -54,24 +54,76 @@ eliminaPropiedad(X,Y):-
 	quieroClase(Y,W,P),
 	crearNuevaListaProps(P,X).
 
+eliminaRelacion(X,Y):-
+	rb(W),
+	quieroClase(Y,W,P),
+	crearNuevaListaRels(P,X).
+
+modificaNombre(X,Y):-
+	rb(W),
+	quieroClase(Y,W,P),
+	creaNuevoNombre(P,X).
+
+modificaPropiedad(P,X,P1):-
+	rb(W),
+	quieroClase(X,W,Cl),
+	nth0(0,Cl,N),
+	nth0(1,Cl,Pa),
+	nth0(2,Cl,Props),
+	nth0(3,Cl,Rels),
+	PB= P=>P1,
+	Elem= P=>Xv,
+	select(Elem,Props,L1),
+	sus(Elem,PB,Props,S),
+	H1=[N,Pa,S,Rels],
+	rb(W),
+	sus(Cl,H1,W,S1),
+	guardarBD(S1).
+
+modificaRelacion(P,X,P1):-
+	rb(W),
+	quieroClase(X,W,Cl),
+	quieroClase(P1,W,Cl1),
+	nth0(0,Cl,N),
+	nth0(1,Cl,Pa),
+	nth0(2,Cl,Props),
+	nth0(3,Cl,Rels),
+	nth0(0,Cl1,IDCl1),
+	segundoTermino(IDCl1,Id),
+	PB= P=>Id,
+	Elem= P=>Xv,
+	select(Elem,Rels,L1),
+	sus(Elem,PB,Rels,S),
+	H1=[N,Pa,Props,S],
+	rb(W),
+	sus(Cl,H1,W,S1),
+	guardarBD(S1).
+
+creaNuevoNombre(P,X):-
+	nth0(0,P,N),
+	nth0(1,P,Pa),
+	nth0(2,P,Props),
+	nth0(3,P,Rels),
+	PB= nombre=>X,
+	cabeza(Props,Ca),
+	sus(Ca,PB,Props,S),
+	H1=[N,Pa,S,Rels],
+	rb(W),
+	sus(P,H1,W,S1),
+	guardarBD(S1).
+
 crearNuevaListaProps(X,Y):-
 	nth0(0,X,N),
 	nth0(1,X,P),
 	nth0(2,X,Props),
 	nth0(3,X,Rels),
-	nth0(4,X,Inds),
 	PB= Y=>XX,
+	Y \= nombre,
 	eliminaClase(PB,Props,P1),
-	H1=[N,P,P1,Rels,Inds],
+	H1=[N,P,P1,Rels],
 	rb(W),
 	sus(X,H1,W,S),
 	guardarBD(S).
-
-eliminaRelacion(X,Y):-
-	rb(W),
-	quieroClase(Y,W,P),
-	write('P : '),write(P),nl,
-	crearNuevaListaRels(P,X).
 
 crearNuevaListaProps(X,Y):-
 	nth0(0,X,N),
@@ -126,3 +178,4 @@ crearNuevaLista(X,M,R,Pop,[H|T]):-
 		guardarBD(S),
 		crearNuevaLista(X,M,R,Pop,T)
 	);crearNuevaLista(X,M,R,Pop,T).
+
