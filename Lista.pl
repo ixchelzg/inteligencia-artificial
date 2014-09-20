@@ -108,20 +108,27 @@ sacaPadreDeClase([H|T],Y):- cabeza(T,Z), segundotermino(Z,Y), !.
 sacaPropiedadesDeClase([H|T],Y):- cola(T,Z), cabeza(Z,Y), !.
 sacaRelacionesDeClase([H|T],Y):- cola(T,L), cola(L,P), cabeza(P,Y), !.
 sacaListaIndividuosDeClase([H|T],Y):- cola(T,L), cola(L,P), cola(P,M), cabeza(M,Y), !.
-																	
+
+buscaIndividuoEnListaDeIndividuos(X,[],Y):- Y = false.		
+buscaIndividuoEnListaDeIndividuos(X,[H|T],Y):- 
+											cabeza(H,L),
+											segundotermino(L,K),
+											X == K,
+											Y = true,!
+											;
+											buscaIndividuoEnListaDeIndividuos(X,T,Y),!.
+
+encuentraClasesALasQuePerteneceUnIndividuo(X,Y):- encuentraNombreClaseDeIndividuo(X,Z), sacaClasesPadreDeUnaClaseInicio(Z,W), anade(W,Z,Y),!.
+											
+encuentraNombreClaseDeIndividuo(X,Y):-	encuentraClaseDeIndividuoInicio(X,Z), sacaNombreDeClase(Z,Y).
+
 encuentraClaseDeIndividuoInicio(X,Y):- rb(W), encuentraClaseDeIndividuo(X,W,Y).	
 encuentraClaseDeIndividuo(X,[H|T],Y):-  
 										sacaListaIndividuosDeClase(H,N),
-										cabeza(N,V),
-										cabeza(V,I),
-										cabeza(I,F),
-										segundotermino(F,A),
-										write('A: '), write(A), nl,
-										X == A,
-										write('Encontrado'), nl,
-										cabeza(H,Q),
-										segundotermino(Q,Y),!
-										;
+										buscaIndividuoEnListaDeIndividuos(X,N,M),
+										M == true,
+										Y = H,
+										!;
 										encuentraClaseDeIndividuo(X,T,Y)
 										.
 								
@@ -190,7 +197,11 @@ sacaClasesPadreDeUnaClase(X,[H|T],Y):- cabeza(H,Z),
 										sacaClasesPadreDeUnaClase(X,T,Y),
 										!.
 
-								
+
+rli(Y):- Y = [
+		[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]], 
+		[individuo=>gusano, [ojos=>0, movimiento=>arrastra],[]]
+	].										
 
 ri(Y):- Y =	[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]].						
 								
