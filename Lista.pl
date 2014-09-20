@@ -191,7 +191,7 @@ sacaClasesPadreDeUnaClase(X,[H|T],Y):- cabeza(H,Z),
 										cabeza(U,L),
 										segundotermino(L,K),
 										sacaClasesPadreDeUnaClaseInicio(K,W),
-										K \= top,
+										K \= 0,
 										anade(K,W,Y),
 										!;
 										sacaClasesPadreDeUnaClase(X,T,Y),
@@ -209,21 +209,61 @@ sacaIndividuoDeListaDeIndividuos(X,[H|T],Y):-
 								Y=H,!;
 sacaIndividuoDeListaDeIndividuos(X,T,Y),!.
 
-sacaPropiedadesDeIndividuo([H|T],Y):- 
+sacaPropiedadesDeIndividuo([H|T],Y):- cabeza(T,Y),!.
 
 
-%sacalaspropiedadesIncluidasLasHeredadasDeUnIndividuo(X,Y):-
-%encuentraClaseDeIndividuoInicio(X,Z),
-%sacaListaIndividuosDeClase(Z,W),
-%sacaIndividuoDeListaDeIndividuos(W,S),
+decideSiEsClaseOIndividuo(X,Y):- rb(W),
+encuentraClaseDeIndividuoInicio(X,S), Y = individuo,!;
+sacaClasePorNombreInicio(X,R), Y = clase,!.
 
-%sacaLasPropiedadesDeClasesPadreParaIndividuoInicioFlat(X,Y),
+sacaPropiedadesDeListaDeClasesInicio(X,Y):- rb(W),sacaPropiedadesDeListaDeClases(X,W,Y).
+sacaPropiedadesDeListaDeClases([],W,Y).
+sacaPropiedadesDeListaDeClases([H|T],W,Y):-
+sacaClasePorNombreInicio(H,U),
+sacaPropiedadesDeClase(U,N),
+sacaPropiedadesDeListaDeClases(T,W,G),
+anade(N,G,K), flatten(K,Y),!.
+
+sacalaspropiedadesIncluidasLasHeredadasDeUnaClase(X,Y):-
+				sacaClasePorNombreInicio(X,W),
+				sacaPropiedadesDeClase(W,R),
+				sacaClasesPadreDeUnaClaseInicio(X,S),
+				sacaPropiedadesDeListaDeClasesInicio(S,Y).
 
 
+sacalaspropiedadesIncluidasLasHeredadasDeUnIndividuo(X,Y):-
+						encuentraClaseDeIndividuoInicio(X,Z),
+						sacaListaIndividuosDeClase(Z,W),
+						sacaIndividuoDeListaDeIndividuos(X,W,S),
+						sacaPropiedadesDeIndividuo(S,M),
+						sacaLasPropiedadesDeClasesPadreParaIndividuoInicioFlat(X,K),
+						anade(K,M,L),
+						flatten(L,Y),!.
+
+borraDeListaDeAtributos(X,[],Y).
+borraDeListaDeAtributos(X,[H,T],Y):-
+	write('H: '), write(H), nl,
+	primertermino(H,S),
+	write('S: '), write(S), nl,
+	X == S,
+	R = T;
+	borraDeListaDeAtributos(X,T,Y).
+
+sacalaspropiedadesMonotonicasInicio(X,Y):-
+sacalaspropiedadesIncluidasLasHeredadasDeLoQueSea(X,W),
+sacalaspropiedadesMonotonicas(X,W,Y).
+
+sacalaspropiedadesMonotonicas(X,[],Y).
+sacalaspropiedadesMonotonicas(X,[H|T],Y).
 
 
-
-
+sacalaspropiedadesIncluidasLasHeredadasDeLoQueSea(X,Y):-
+decideSiEsClaseOIndividuo(X,D),
+D == clase,
+sacalaspropiedadesIncluidasLasHeredadasDeUnaClase(X,Y),!
+;
+sacalaspropiedadesIncluidasLasHeredadasDeUnIndividuo(X,Y),!
+.
 
 sacaLasPropiedadesDeClasesPadreParaIndividuoInicioFlat(X,Y):-sacaLasPropiedadesDeClasesPadreParaIndividuoInicio(X,Z), flatten(Z,Y).
 sacaLasPropiedadesDeClasesPadreParaIndividuoInicio(X,Y):-encuentraClasesALasQuePerteneceUnIndividuo(X,W),
@@ -241,7 +281,7 @@ rli(Y):- Y = [
 
 ri(Y):- Y =	[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]].						
 								
-rc(Y):- Y = [nombre=>animal, padre=>top, 
+rc(Y):- Y = [id=>1, id_Padre=>0, 
 	[vida=>finita, ojos=>2],
 	[odia=>pinguino],
 	[
@@ -251,34 +291,34 @@ rc(Y):- Y = [nombre=>animal, padre=>top,
 	].
 								
 rb(Y):- Y = [
-	[nombre=>animal, padre=>top, 
-	[vida=>finita, ojos=>2],
+	[id=>1, id_Padre=>0, 
+	[nombre=>animal ,vida=>finita, ojos=>2],
 	[odia=>pinguino],
 	[
-		[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]], 
-		[individuo=>gusano, [ojos=>0, movimiento=>arrastra],[]]
+		[id=>101, [nombre=>'estrella de mar',ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]], 
+		[id=>102, [nombre=>gusano, ojos=>0, movimiento=>arrastra],[]]
 	]
 	],
-	[nombre=>oviparo,padre=>animal,
-	[nace=>huevo],
+	[id=>2, id_Padre=>1,
+	[nombre=>oviparo,nace=>huevo],
 	[odia=>viviparo],
 	[
-		[individuo=>hormiga, [carga=>mucho, ojos=>100], [come=>gusano]]
+		[id=>103, [nombre=>hormiga, carga=>mucho, ojos=>100], [come=>gusano]]
 	]
 	],
-	[nombre=>viviparo,padre=>animal,
+	[id=>3, id_Padre=>1
 	[nace=>placenta],
 	[odia=>oviparo],
 	[
-		[individuo=>mosca, [movimiento=>vuela], [come=>gusano]],
-		[individuo=>delfin, [movimiento=>nada], []]
+		[id=>104, [nombre=>mosca, movimiento=>vuela], [come=>gusano]],
+		[id=>105, [nombre=>delfin, movimiento=>nada], []]
 	]
 	],
-	[nombre=>ave,padre=>oviparo,
-	[movimiento=>vuela],
+	[id=>4, id_padre=>2,
+	[nombre=>ave, movimiento=>vuela],
 	[],
 	[
-		[individuo=>phoenix, [vida=>infinita], [come=>leon]]
+		[id=>105, [nombre=>phoenix, vida=>infinita], [come=>leon]]
 	]
 	],
 	[nombre=>pez,padre=>oviparo,
