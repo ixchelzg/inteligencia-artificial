@@ -4,39 +4,16 @@
 
 main:-
 	consult('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/main.pl').
-rb1(Y):-
+rb(Y):-
 	open_kb('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/bd.txt',Y).
 guardarBD(Y):-
 	save_kb('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/bd.txt',Y).
-
-
-my_remove_one_element(X, [X|Xs], Xs).
-
-my_remove_one_element(X, [Y|Ys], [Y|Zs]):-
-          my_remove_one_element(X, Ys, Zs).
 
 primertermino(X,Y):- X = W=>Z, Y=W.
 segundotermino(X,Y):- X = W=>Z, Y=Z.
 valor(X,[],Y):- fail.
 valor(X,[H|T],Y):- primertermino(H,X), segundotermino(H,Y), !.
 valor(X,[H|T],Y):- primertermino(H,Z), X\=Z, valor(X,T,Y).
-
-
-props(X,Y):- 
-	slice(3,3,X,Y).
-rels(X,Y):-
-	slice(4,4,X,Y).
-
-
-valor(X,[H|T],Y):- primertermino(H,X), segundotermino(H,Y), !.
-valor(X,[H|T],Y):- primertermino(H,Z), X\=Z, valor(X,T,Y).
-
-slice([X|_],1,1,[X]).
-slice([X|T],1,K,[X|T1]) :- K > 1, 
-   K1 is K - 1, slice(T,1,K1,T1).
-slice([_|T],I,K,Y) :- I > 1, 
-   I1 is I - 1, K1 is K - 1, slice(T,I1,K1,Y).
-
 
 cabeza([H|T],Y):- Y=H.
 cola([H|T],Y):- Y=T.
@@ -171,32 +148,79 @@ concatenar([X|L1],L2,[X|L3]):-concatenar(L1,L2,L3).
 
 
 elimina(X):-
-	rb1(W),
-	MM=[nombre=>X,_,_,_,_],
-	quieroPadre(MM,W,P),
-	nth0(2,P,Pr),
-	nth0(3,P,Rel),
-	valor(padre,P,Pop),
-	(	
+	rb(W),
+	(
+		MM=[nombre=>X,_,_,_,_],
+		quieroPadre(MM,W,P),
+		nth0(2,P,Pr),
+		nth0(3,P,Rel),
+		valor(padre,P,Pop),
 		Pop\=top,
 		crearNuevaListaInicio(X,Pr,Rel,Pop),
-		rb1(W1),
+		rb(W1),
 		eliminaClase(MM,W1,S),
 		guardarBD(S)
-	);
+	); crearNuevaListaInicioInd(X).
+
+
+eliminaPropiedad(X,Y):-
 	(
-		crearNuevaListaInicioInd(X)
+		rb(W),
+		MM=[nombre=>Y,_,_,_,_],
+		quieroPadre(MM,W,P),
+		crearNuevaListaProps(P,X)
+	);(
+		rb(W),
+		write('aqui nomas'),nl,
+		crearNuevaListaIndProps(X,Y,W,W)
+	).
+
+crearNuevaListaProps(X,Y):-
+	nth0(0,X,N),
+	nth0(1,X,P),
+	nth0(2,X,Props),
+	nth0(3,X,Rels),
+	nth0(4,X,Inds),
+	PB= Y=>XX,
+	eliminaClase(PB,Props,P1),
+	H1=[N,P,P1,Rels,Inds],
+	rb(W),
+	sus(X,H1,W,S),
+	guardarBD(S).
+
+crearNuevaListaIndProps(X,Y,W,[]).
+crearNuevaListaIndProps(X,Y,W,[H|T]):-
+	nth0(4,H,Inds),
+	crearNuevaListaIndDeepProps(X,Y,H,Inds,Inds),
+	crearNuevaListaIndProps(X,Y,W,T).
+
+crearNuevaListaIndDeepProps(X,Y,Lw,Inds,[]).
+crearNuevaListaIndDeepProps(X,Y,Lw,Inds,[H|T]):-
+	(
+		RR= X=>XX,
+		valor(individuo,H,Y),
+		nth0(0,H,Nm),
+		nth0(1,H,Props),
+		nth0(2,H,Rels),
+		member(RR,Props),
+		eliminaClase(RR,Props,LP),
+		H1=[Nm,LP,Rels],
+		rb(W),
+		sus(H,H1,Inds,S),
+		sus(Inds,S,Lw,S1),
+		eliminaClase(Inds,Lw,LL),
+		concatenar(LL,S,L2),
+		sus(Lw,L2,W,STs),
+		guardarBD(STs)
 	)
-	.
+	;
+	crearNuevaListaIndDeepProps(X,Y,Lw,Inds,T).
 
 quieroPadre(X,[X|T],X).
 quieroPadre(X,[H|T],Y):-
 	quieroPadre(X,T,Y).
 
-crearNuevaListaInicioInd(X):- rb1(W), crearNuevaListaInd(X,W).
-
-
-crearNuevaListaIndRel(X,W,[]).
+crearNuevaListaIndRel(X,W,TI,[]).
 crearNuevaListaIndRel(X,W,TI,[H|T]):-
 	(
 		nth0(2,H,Rels),
@@ -206,7 +230,7 @@ crearNuevaListaIndRel(X,W,TI,[H|T]):-
 		member(RR,Rels),
 		eliminaClase(RR,Rels,LR),
 		H1=[Nm,P2,LR],
-		rb1(W1),
+		rb(W1),
 		sus(H,H1,TI,S),
 		member(TI,W),
 		sus(T1,S,W,S1),
@@ -219,12 +243,11 @@ crearNuevaListaIndRel(X,W,TI,[H|T]):-
 	;
 	crearNuevaListaIndRel(X,W,TI,T).
 
-
+crearNuevaListaInicioInd(X):- rb(W), crearNuevaListaInd(X,W).
 crearNuevaListaInd(X,[]).
 crearNuevaListaInd(X,[H|T]):-
-	(
-		valor(padre,H,P),
-		P\=top,
+	valor(padre,H,P),
+		(
 		nth0(4,H,Is),
 		IM = [individuo=>X,_,_],
 		member(IM,Is),
@@ -233,144 +256,62 @@ crearNuevaListaInd(X,[H|T]):-
 		nth0(3,H,R2),
 		valor(nombre,H,Nm),
 		H1=[nombre=>Nm,padre=>P,P2,R2,ISs],
-		rb1(W),
+		rb(W),
 		sus(H,H1,W,S),
 		guardarBD(S),
 		crearNuevaListaInd(X,T)
 	);
 	(
-	valor(padre,H,P),
-	nth0(3,H,Rel),
-	RR= XXX=>X,
+		nth0(3,H,Rel),
+		RR= XXX=>X,
 		(
 			member(RR,Rel),
-			P\=top,
 			eliminaClase(RR,Rel,Rs),
 			nth0(2,H,P2),
 			nth0(4,H,ISs),
 			valor(nombre,H,Nm),
 			H1=[nombre=>Nm,padre=>P,P2,Rs,ISs],
-			rb1(W),
+			rb(W),
 			sus(H,H1,W,S),
 			guardarBD(S),
 			crearNuevaListaInd(X,T)
 		);
 		(
-			P\=top,
 			nth0(4,H,Inds),
 			crearNuevaListaIndRel(X,H,Inds,Inds),
 			crearNuevaListaInd(X,T)
 		)
 	)
-	;
-	P\=top,crearNuevaListaInd(X,T).
+	; crearNuevaListaInd(X,T).
 
-crearNuevaListaInicio(X,M,R,Pop):- rb1(W), crearNuevaLista(X,M,R,Pop,W).
+crearNuevaListaInicio(X,M,R,Pop):- rb(W), crearNuevaLista(X,M,R,Pop,W).
 
 crearNuevaLista(X,M,R,Pop,[]).
 crearNuevaLista(X,M,R,Pop,[H|T]):-
 	(
-	valor(padre,H,X),
-	nth0(2,H,P2),
-	nth0(3,H,R2),
-	concatenar(M,P2,L1),
-	concatenar(R,R2,L2),
-	valor(nombre,H,Nm),
-	H1=[nombre=>Nm,padre=>Pop,L1,L2,[]],
-	rb1(W),
-	sus(H,H1,W,S),
-	guardarBD(S),
-	crearNuevaLista(X,M,R,Pop,T)
+		valor(padre,H,X),
+		nth0(2,H,P2),
+		nth0(3,H,R2),
+		concatenar(M,P2,L1),
+		concatenar(R,R2,L2),
+		valor(nombre,H,Nm),
+		H1=[nombre=>Nm,padre=>Pop,L1,L2,[]],
+		rb(W),
+		sus(H,H1,W,S),
+		guardarBD(S),
+		crearNuevaLista(X,M,R,Pop,T)
 	);(
-	valor(padre,H,P),
-	nth0(3,H,Rel),
-	RR= XXX=>X,
-	member(RR,Rel),
-	eliminaClase(RR,Rel,Rs),
-	nth0(2,H,P2),
-	nth0(4,H,ISs),
-	valor(nombre,H,Nm),
-	H1=[nombre=>Nm,padre=>P,P2,Rs,ISs],
-	rb1(W),
-	sus(H,H1,W,S),
-	guardarBD(S),
-	crearNuevaLista(X,M,R,Pop,T)
+		valor(padre,H,P),
+		nth0(3,H,Rel),
+		RR= XXX=>X,
+		member(RR,Rel),
+		eliminaClase(RR,Rel,Rs),
+		nth0(2,H,P2),
+		nth0(4,H,ISs),
+		valor(nombre,H,Nm),
+		H1=[nombre=>Nm,padre=>P,P2,Rs,ISs],
+		rb(W),
+		sus(H,H1,W,S),
+		guardarBD(S),
+		crearNuevaLista(X,M,R,Pop,T)
 	);crearNuevaLista(X,M,R,Pop,T).
-								
-rb(Y):- Y = [
-	[nombre=>animal, padre=>top, 
-	[vida=>finita, ojos=>2],
-	[odia=>pinguino],
-	[
-		[individuo=>'estrella de mar',[ojos=>0, movimiento=>arrastra],[odia=>leon, ama=>pinguino]], 
-		[individuo=>gusano, [ojos=>0, movimiento=>arrastra],[]]
-	]
-	],
-	[nombre=>oviparo,padre=>animal,
-	[nace=>huevo],
-	[odia=>viviparo],
-	[
-		[individuo=>hormiga, [carga=>mucho, ojos=>100], [come=>gusano]]
-	]
-	],
-	[nombre=>viviparo,padre=>animal,
-	[nace=>placenta],
-	[odia=>oviparo],
-	[
-		[individuo=>mosca, [movimiento=>vuela], [come=>gusano]],
-		[individuo=>delfin, [movimiento=>nada], []]
-	]
-	],
-	[nombre=>ave,padre=>oviparo,
-	[movimiento=>vuela],
-	[],
-	[
-		[individuo=>phoenix, [vida=>infinita], [come=>leon]]
-	]
-	],
-	[nombre=>pez,padre=>oviparo,
-	[movimiento=>nada],
-	[odia=>leon],
-	[]
-	],
-	[nombre=>mamifero,padre=>viviparo,
-	[movimiento=>vuela],
-	[],
-	[
-		[individuo=>leon, [armas=>garra], [come=>pinguino]]
-	]
-	],
-	[nombre=>pato,padre=>ave,
-	[movimiento=>nada],
-	[come=>pez],
-	[
-		[individuo=>hugo, [color=>rojo], [hermano=>paco]],
-		[individuo=>paco, [color=>azul], [hermano=>luis]],
-		[individuo=>luis, [color=>verde], []]
-	]
-	],
-	[nombre=>aguila,padre=>ave,
-	[movimiento=>vuela, arma=>garras],
-	[],
-	[
-		[individuo=>'aguila calva', [pelo=>no], []]
-	]
-	],
-	[nombre=>pinguino,padre=>ave,
-	[movimiento=>nada],
-	[come=>pez],
-	[]
-	],
-	[nombre=>huachinango,padre=>pez,
-	[movimiento=>nada, sabor=>delicioso],
-	[],
-	[]
-	],
-	[nombre=>'pez volador',padre=>pez,
-	[movimiento=>vuela],
-	[come=>gusano],
-	[
-		[individuo=>flippy, [fama=>mucha], []]
-	]
-	]
-].
