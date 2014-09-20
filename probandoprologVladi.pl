@@ -175,13 +175,41 @@ eliminaPropiedad(X,Y):-
 		crearNuevaListaIndProps(X,Y,W,W)
 	).
 
-anadeClase(Id,P) :-
-	rb(X), 
-	Q=[id=>Id,id_ ].
+anadeClase(N,Pa) :-
+	rb(X),
+	nuevoId(Id),
+	Pr=[nombre=>N],
+	Q=[id=>Id,id_Padre=>Pa,_,_,_],
+	anadePropiedadC(Pr,N).
+
 anadeClase(N,P,H) :-
 	.
-anadeObjeto :-
+anadeObjeto() :-
 	.
+anadePropiedadC(C,A,Pr,N,B) :-
+	.
+anadePropiedadO() :-
+	.
+
+nuevoId(Id) :-
+	rb(X),
+	reverse(X,Y),
+	[H|T] = Y,
+	[A|B] = H,
+	segundoTermino(A,Idmax),
+	atom_length(Idmax, Len),
+	L is Len - 1,
+	sub_atom(Idmax, 1, L, A, S),
+	atom_number(S,S1), 
+	Id is S1 + 1.
+
+quieroClase(X,[],P).
+quieroClase(X,[H|T],P):-
+	nth0(2,H,Props),
+	cabeza(Props,S),
+	segundotermino(S,X),
+	P=H;
+	quieroClase(X,T,P).
 
 crearNuevaListaProps(X,Y):-
 	nth0(0,X,N),
