@@ -287,10 +287,10 @@ clasesPadresDeUnObjeto(X,Y):- rb(W),
 
 % 1e Regresa las propiedades tanto propias como heredadas de un elemento (clase u objeto indistintamente)
 % Todas las propiedades de un objeto o clase
-% Para objeto
+% Para objeto.
 % Ej.?- propiedadesMonotonicasHeredadasYPropiasDeUnElemento(phoenix,Y).
 % Y = [nombre=>phoenix, vida=>infinita, movimiento=>vuela, nace=>huevo, ojos=>2].
-% Para clase
+% Para clase.
 % Ej.?- propiedadesMonotonicasHeredadasYPropiasDeUnElemento(pato,Y).
 % Y = [nombre=>pato, movimiento=>nada, nace=>huevo, vida=>finita, ojos=>2].
 
