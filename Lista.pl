@@ -253,7 +253,7 @@ buscaRelacionEnlistaDeRelacionesDeObjetos(X,[H|T],Y):-
 								Y = M,!.
 
 
-% 1d Regresa la las clases padres de un objeto.
+% 1d Regresa las clases padres de un objeto.
 % Todas las clases a las que pertenece un objeto.
 % Ej.?- clasesPadresDeUnObjetoRevisado(hugo,Y).
 % Y = [pato, ave, oviparo, animal].
@@ -261,7 +261,7 @@ buscaRelacionEnlistaDeRelacionesDeObjetos(X,[H|T],Y):-
 % Lanza mensaje si la entidad consultada no es un Objeto
 % Ej.?- clasesPadresDeUnObjetoRevisado(pato,Y).
 % pato no es un objeto
-% vtrue.
+% true.
 
 clasesPadresDeUnObjetoRevisado(X,Y):- rb(W),
 								regresaTuplaPorNombre(X,W,S),
@@ -284,6 +284,51 @@ clasesPadresDeUnObjeto(X,Y):- rb(W),
 								;
 								Y = [].
 
+
+% 1e Regresa las propiedades tanto propias como heredadas de un elemento (clase u objeto indistintamente)
+% Todas las propiedades de un objeto o clase
+% Para objeto
+% Ej.?- propiedadesMonotonicasHeredadasYPropiasDeUnElemento(phoenix,Y).
+% Y = [nombre=>phoenix, vida=>infinita, movimiento=>vuela, nace=>huevo, ojos=>2].
+% Para clase
+% Ej.?- propiedadesMonotonicasHeredadasYPropiasDeUnElemento(pato,Y).
+% Y = [nombre=>pato, movimiento=>nada, nace=>huevo, vida=>finita, ojos=>2].
+
+propiedadesHeredadasDeUnElementoInicio(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId_padre(S,L), 
+								L \= c0,
+								regresaTuplaPorId(L,W,N),
+								regresaNombre(N,M),
+								regresaPropiedades(N,J),
+								propiedadesHeredadasDeUnElementoInicio(M,K),
+								append(J,K,Y),!
+								;
+								Y = [].
+
+propiedadesHeredadasYPropiasDeUnElemento(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaPropiedades(S,J),
+								propiedadesHeredadasDeUnElementoInicio(X,K),
+								append(J,K,Y), !.
+
+propiedadesMonotonicasHeredadasYPropiasDeUnElemento(X,Y):- propiedadesHeredadasYPropiasDeUnElemento(X,S),
+								borraPropiedadesRepetidasDeUnElemento(S,Y).
+
+borraPropiedadDeListaDePropiedadesDeUnElemento([],X,Y):- Y = [].
+borraPropiedadDeListaDePropiedadesDeUnElemento([H|T],X,Y):-primerTermino(H,L), 
+								X==L,
+								borraPropiedadDeListaDePropiedadesDeUnElemento(T,X,R), 
+								Y = R,!
+								; 
+								borraPropiedadDeListaDePropiedadesDeUnElemento(T,X,R), 
+								append([H],R,Y),!.
+
+borraPropiedadesRepetidasDeUnElemento([],Y):- Y = [].
+borraPropiedadesRepetidasDeUnElemento([H|T],Y):- primerTermino(H,L),
+								borraPropiedadDeListaDePropiedadesDeUnElemento(T,L,R),
+								borraPropiedadesRepetidasDeUnElemento(R,P),
+								append([H],P,Y), !.
 
 
 rb(Y):- Y = [
