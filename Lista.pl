@@ -20,8 +20,7 @@ valor(X,[],Y):- fail.
 valor(X,[H|T],Y):- primerTermino(H,Z), 
 								X=Z, 
 								segundoTermino(H,W), 
-								Y=W, 
-								!.
+								Y=W,!.
 valor(X,[H|T],Y):- primerTermino(H,Z), 
 								X\=Z, 
 								valor(X,T,Y).
@@ -38,16 +37,19 @@ regresaRelaciones([H|T],Y):- T=[HT|TT],
 regresaNombre(X,Y):- regresaPropiedades(X,S), 
 								valor(nombre,S,Y).
 
+% Regresa el nombre mas el operador asociado a una tupla.
+regresaNombreCompleto(X,Y):- regresaPropiedades(X,S), 
+								S=[H|T], Y = H.
+
 % Regresa una tupla entera de la base de datos según un nombre.
 regresaTuplaPorNombreInicio(X,Y):- rb(W), 
 								regresaTuplaPorNombre(X,W,Y),!.
 regresaTuplaPorNombre(X,[],Y):-fail.
 regresaTuplaPorNombre(X,[H|T],Y):- regresaNombre(H,S), 
 								X==S, 
-								Y = H, 
-								!; 
-								regresaTuplaPorNombre(X,T,Y), 
-								!.
+								Y = H, !
+								; 
+								regresaTuplaPorNombre(X,T,Y), !.
 
 % Regresa una tupla entera de la base de datos según un id.
 regresaTuplaPorIdInicio(X,Y):- rb(W), 
@@ -55,21 +57,20 @@ regresaTuplaPorIdInicio(X,Y):- rb(W),
 regresaTuplaPorId(X,[],Y):-fail.
 regresaTuplaPorId(X,[H|T],Y):- regresaId(H,S), 
 								X==S, 
-								Y = H, 
-								!; 
-								regresaTuplaPorId(X,T,Y), 
-								!.  
+								Y = H, !
+								; 
+								regresaTuplaPorId(X,T,Y), !.  
 
 % 1a Regresa la extensión de una clase. 
 % La extensión de una clase (el conjunto de todos los objetos que pertenecen a la misma, ya sea porque se declaren directamente o porque están en la cerradura de la relación de herencia).
 % Ej.
 % ?- extensionDeUnaClaseInicio(ave,Y).
 % Y = [phoenix, hugo, paco, luis, 'aguila calva'].
+
 extensionDeUnaClaseInicio(X,Y):- rb(W), 
 								regresaTuplaPorNombre(X,W,S), 
 								regresaId(S,L), 
-								extensionDeUnaClase(L,W,Y), 
-								!.
+								extensionDeUnaClase(L,W,Y),!.
 extensionDeUnaClase(X,[],Y):- Y = [].
 extensionDeUnaClase(X,[H|T],Y):- 
 								regresaId_padre(H,S), 
@@ -81,8 +82,8 @@ extensionDeUnaClase(X,[H|T],Y):-
 								C == 'c',
 								extensionDeUnaClaseInicio(N,P),
 								extensionDeUnaClase(X,T,R), 
-								append(P,R,Y),
-								!;
+								append(P,R,Y),!
+								;
 								regresaId_padre(H,S), 
 								X==S,
 								regresaNombre(H,N),
@@ -91,10 +92,9 @@ extensionDeUnaClase(X,[H|T],Y):-
 								J=[C|V], 
 								C == 'o',
 								extensionDeUnaClase(X,T,R), 
-								append([N],R,Y),
-								!; 
-								extensionDeUnaClase(X,T,Y),
-								!.
+								append([N],R,Y),!
+								; 
+								extensionDeUnaClase(X,T,Y),!.
 
 % 1b Regresa la extensión de una propiedad. 
 % La extensión de una propiedad (mostrar todos los objetos que tienen una propiedad específica ya sea por declaración directa o por herencia, incluyendo su respectivo valor).
@@ -109,8 +109,7 @@ propiedadesHeredadasDeUnArticuloInicio(X,Y):- rb(W),
 								regresaNombre(N,M),
 								regresaPropiedades(N,J),
 								propiedadesHeredadasDeUnArticuloInicio(M,K),
-								append(J,K,Y),
-								!
+								append(J,K,Y),!
 								;
 								Y = [].
 
@@ -167,15 +166,96 @@ buscaPropiedadEnlistaDePropiedadesDeObjetos(X,[H|T],Y):-
 								concat(D,S,A),
 								append([A],M,Y),!
 								;
-								buscaPropiedadEnlistaDePropiedadesDeObjetos(X,T,M), Y = M,!
-								.
+								buscaPropiedadEnlistaDePropiedadesDeObjetos(X,T,M), 
+								Y = M,!.
 
+% 1c Regresa la extensión de una relación. 
+% La extensión de una relación (mostrar todos los objetos que tienen una relación específica ya sea por declaración directa o por herencia, incluyendo con quién estén relacionados).
+% Ej. ?- buscaRelacionEnlistaDeRelacionesDeObjetosInicio(come,Y).
+% Y = ['hormiga: come=>gusano', 'mosca: come=>gusano', 'phoenix: come=>leon', 'leon: come=>pinguino', 'hugo: come=>pez', 'paco: come=>pez', 'luis: come=>pez', 'flippy: come=>gusano'].
 
+relacionesHeredadasDeUnArticuloInicio(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId_padre(S,L), 
+								L \= c0,
+								regresaTuplaPorId(L,W,N),
+								regresaNombre(N,M),
+								regresaRelaciones(N,J),
+								J=[H|T],
+								relacionesHeredadasDeUnArticuloInicio(M,K),
+								append(H,K,Y),!
+								;
+								Y = [].			
+
+relacionesHeredadasYPropiasDeUnArticulo(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaRelaciones(S,J),
+								J=[H|T],
+								relacionesHeredadasDeUnArticuloInicio(X,K),
+								append(H,K,G),
+								regresaNombreCompleto(S,C),
+								append([C],G,Y),
+								!.
+
+relacionesMonotonicasHeredadasYPropiasDeUnArticulo(X,Y):- relacionesHeredadasYPropiasDeUnArticulo(X,S),
+								borraRelacionesRepetidas(S,Y).
+
+borraRelacionDeListaDeRelaciones([],X,Y):- Y = [].
+borraRelacionDeListaDeRelaciones([H|T],X,Y):-primerTermino(H,L), 
+								X==L,
+								borraRelacionDeListaDeRelaciones(T,X,R), 
+								Y = R,!
+								; 
+								borraRelacionDeListaDeRelaciones(T,X,R), 
+								append([H],R,Y),!.
+
+borraRelacionesRepetidas([],Y):- Y = [].
+borraRelacionesRepetidas([H|T],Y):- 
+								primerTermino(H,L),
+								borraRelacionDeListaDeRelaciones(T,L,R),
+								borraRelacionesRepetidas(R,P),
+								append([H],P,Y),
+								!.
+
+haceListaDeRelacionesParaTodosLosObjetosInicio(Y):- rb(W), 
+								haceListaDeRelacionesParaTodosLosObjetos(W,Y).
+
+haceListaDeRelacionesParaTodosLosObjetos([],Y):- Y = [].
+haceListaDeRelacionesParaTodosLosObjetos([H|T],Y):- regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								regresaNombre(H,P),
+								relacionesMonotonicasHeredadasYPropiasDeUnArticulo(P,R),
+								haceListaDeRelacionesParaTodosLosObjetos(T,S),
+								append([R],S,Y),!
+								;
+								regresaNombre(H,P),
+								haceListaDeRelacionesParaTodosLosObjetos(T,S),
+								Y = S,!.
+
+buscaRelacionEnlistaDeRelacionesDeObjetosInicio(X,Y):-haceListaDeRelacionesParaTodosLosObjetosInicio(W), 
+								buscaRelacionEnlistaDeRelacionesDeObjetos(X,W,Y).
+buscaRelacionEnlistaDeRelacionesDeObjetos(X,[],Y):- Y = [],!.
+buscaRelacionEnlistaDeRelacionesDeObjetos(X,[H|T],Y):- 
+								valor(X,H,S),
+								regresaTuplaPorIdInicio(S,I),
+								regresaNombre(I,O),
+								valor(nombre,H,U),
+								buscaRelacionEnlistaDeRelacionesDeObjetos(X,T,M),
+								concat(U,': ',N),
+								concat(N,X,L),
+								concat(L,'=>',D),
+								concat(D,O,A),
+								append([A],M,Y),!
+								;
+								buscaRelacionEnlistaDeRelacionesDeObjetos(X,T,M), 
+								Y = M,!.
 
 
 
 rb(Y):- Y = [
-	[id=>c1, id_padre=>c0, [nombre=>animal ,vida=>finita, ojos=>2],[odia=>c20]],
+	[id=>c1, id_padre=>c0, [nombre=>animal ,vida=>finita, ojos=>2],[odia=>o2]],
 	[id=>o2, id_padre=>c1, [nombre=>'estrella de mar',ojos=>0, movimiento=>arrastra],[odia=>o13, ama=>c20]], 
 	[id=>o3, id_padre=>c1, [nombre=>gusano, ojos=>0, movimiento=>arrastra],[]],
 	[id=>c4, id_padre=>c1, [nombre=>oviparo,nace=>huevo],[odia=>c6]],
