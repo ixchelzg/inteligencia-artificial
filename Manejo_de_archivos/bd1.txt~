@@ -1,0 +1,26 @@
+[
+	[id=>c1, id_padre=>c0, [nombre=>sol ,tamano=>gigante, temperatura=>mucha, brillo=>mucho],[muy_cerca=>c2]],
+	[id=>c2, id_padre=>c1, [nombre=>mercurio, atmosfera=>delgada, tamano=>pequeno, elemento=>mercurio, color=>carmelitoso],[]], 
+	[id=>c3, id_padre=>c1, [nombre=>venus,color=>blanco, vida=>inexistente, elemento=>cobre],[mas_pequeno=>c4]], 
+	[id=>c4, id_padre=>c1, [nombre=>tierra,vida=>abundante, color=>azul, superficie=>liquida],[se_parece_a=>c6]],
+	[id=>o5, id_padre=>c4, [nombre=>luna, tamano=>muy_pequeno, brillo=>mucho], [es_satelite_de=>sol]],
+	[id=>c6, id_padre=>c1, [nombre=>marte, color=>rojo, elemento=>hierro, fama=>mucha],[]],
+	[id=>o7, id_padre=>c6, [nombre=>fobos, diametro=>_21km], []],
+	[id=>o8, id_padre=>c6, [nombre=>deimos, diametro=>_12km], []],
+	[id=>c9, id_padre=>c1, [nombre=>jupiter, color=>blanco, tamano=>gigante, tormentas=>muchas, interior=>liquido], [mas_granque_que=>c14]],
+	[id=>o10, id_padre=>c9, [nombre=>ganimedes, diametro=>_5262km], []],
+	[id=>o11, id_padre=>c9, [nombre=>lo, diametro=>_3630km], []],
+	[id=>o12, id_padre=>c9, [nombre=>calixto, diametro=>_3140km],[]],
+	[id=>o13, id_padre=>c9, [nombre=>leda, diametro=>_16km], []],
+	[id=>c14, id_padre=>c1, [nombre=>saturno, elemento=>plomo, color=>amarillo, gas=>mucho, lunas=>muchas],[interior_igual_a=>c9]],
+	[id=>o15, id_padre=>c14, [nombre=>atlas, color=>rojo, diametro=>_40km], [hermano=>o16]],
+	[id=>o16, id_padre=>c14, [nombre=>titan, color=>azul, diametro=>_5150km], []],
+	[id=>c17, id_padre=>c1, [nombre=>urano, color=>verde_azul, elemento=>fuego, signo=>acuario, dios_de=>cielo], [hijo=>c4]],
+	[id=>o18, id_padre=>c17, [nombre=>cordelia, diametro=>_15km],[]],
+	[id=>o19, id_padre=>c18, [nombre=>titania, diametro=>_1590km], []],
+	[id=>c20, id_padre=>c1, [nombre=>neptuno, color=>azul, elemento=>agua, signo=>piscis], []],
+	[id=>o21, id_padre=>c20, [nombre=>naiad, diametro=>_60km],[]],
+	[id=>o22, id_padre=>c20, [nombre=>nereida, diametro=>_340km], [come=>o3]],
+	[id=>c23, id_padre=>c1, [nombre=>pluton, color=>naranja], [mas_alejado_de=>c4]]
+	[id=>o24, id_padre=>c23, [nombre=>caronte, diametro=>_1200km], []]
+]

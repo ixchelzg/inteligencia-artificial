@@ -30,21 +30,19 @@ quieroClase(X,[],P).
 quieroClase(X,[H|T],P):-
 	nth0(2,H,Props),
 	cabeza(Props,S),
-	segundoTermino(S,X),
-	P=H;
-	quieroClase(X,T,P).
+	segundoTermino(S,X)->
+		P=H ; quieroClase(X,T,P).
 
 elimina(X):-
 	rb(W),
 	quieroClase(X,W,P),
 	nth0(2,P,Pr),
 	nth0(3,P,Rel),
-	cola(Rel, Rels),
 	cola(Pr,Props),
 	valor(id_padre,P,Pop),
 	valor(id,P,ID),
 	Pop\=c0,
-	crearNuevaListaInicio(ID,Props,Rels,Pop),
+	crearNuevaListaInicio(ID,Props,Rel,Pop),
 	rb(W1),
 	eliminaClase(P,W1,S),
 	guardarBD(S).
