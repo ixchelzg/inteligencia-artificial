@@ -253,6 +253,38 @@ buscaRelacionEnlistaDeRelacionesDeObjetos(X,[H|T],Y):-
 								Y = M,!.
 
 
+% 1d Regresa la las clases padres de un objeto.
+% Todas las clases a las que pertenece un objeto.
+% Ej.?- clasesPadresDeUnObjetoRevisado(hugo,Y).
+% Y = [pato, ave, oviparo, animal].
+%
+% Lanza mensaje si la entidad consultada no es un Objeto
+% Ej.?- clasesPadresDeUnObjetoRevisado(pato,Y).
+% pato no es un objeto
+% vtrue.
+
+clasesPadresDeUnObjetoRevisado(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId(S,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								clasesPadresDeUnObjeto(X,Y),!;
+								write(X),write(' no es un objeto'),nl,!
+								.
+
+clasesPadresDeUnObjeto(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId_padre(S,L), 
+								L \= c0,
+								regresaTuplaPorId(L,W,N),
+								regresaNombre(N,M),
+								clasesPadresDeUnObjeto(M,K),
+								append([M],K,Y),!
+								;
+								Y = [].
+
+
 
 rb(Y):- Y = [
 	[id=>c1, id_padre=>c0, [nombre=>animal ,vida=>finita, ojos=>2],[odia=>o2]],
