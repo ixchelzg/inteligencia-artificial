@@ -331,6 +331,69 @@ borraPropiedadesRepetidasDeUnElemento([H|T],Y):- primerTermino(H,L),
 								append([H],P,Y), !.
 
 
+% 1f Regresa las relaciones tanto propias como heredadas de un elemento (clase u objeto indistintamente)
+% Todas las relaciones de un objeto o clase
+% Para objeto.
+% Ej.?- relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(hugo,Y).
+% Y = ['hermano=>paco', 'come=>pez', 'odia=>viviparo'].
+% Para clase.
+% Ej.?- relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(pato,Y).
+% Y = ['come=>pez', 'odia=>viviparo'].
+
+relacionesHeredadasDeUnElementoInicio(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId_padre(S,L), 
+								L \= c0,
+								regresaTuplaPorId(L,W,N),
+								regresaNombre(N,M),
+								regresaRelaciones(N,J),
+								J=[H|T],
+								relacionesHeredadasDeUnElementoInicio(M,K),
+								append(H,K,Y),!
+								;
+								Y = [].			
+
+relacionesHeredadasYPropiasDeUnElemento(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaRelaciones(S,J),
+								J=[H|T],
+								relacionesHeredadasDeUnElementoInicio(X,K),
+								append(H,K,Y),
+								!.
+
+relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(X,Y):- relacionesMonotonicasHeredadasYPropiasDeUnElemento(X,S),
+								traduceRelacionesDeUnELemento(S,Y).
+
+relacionesMonotonicasHeredadasYPropiasDeUnElemento(X,Y):- relacionesHeredadasYPropiasDeUnElemento(X,S),
+								borraRelacionesRepetidasDeUnElemento(S,Y).
+
+borraRelacionDeListaDeRelacionesDeUnElemento([],X,Y):- Y = [].
+borraRelacionDeListaDeRelacionesDeUnElemento([H|T],X,Y):-primerTermino(H,L), 
+								X==L,
+								borraRelacionDeListaDeRelacionesDeUnElemento(T,X,R), 
+								Y = R,!
+								; 
+								borraRelacionDeListaDeRelacionesDeUnElemento(T,X,R), 
+								append([H],R,Y),!.
+
+borraRelacionesRepetidasDeUnElemento([],Y):- Y = [].
+borraRelacionesRepetidasDeUnElemento([H|T],Y):- 
+								primerTermino(H,L),
+								borraRelacionDeListaDeRelacionesDeUnElemento(T,L,R),
+								borraRelacionesRepetidasDeUnElemento(R,P),
+								append([H],P,Y),
+								!.
+
+traduceRelacionesDeUnELemento([],Y):- Y = []. 
+traduceRelacionesDeUnELemento([H|T],Y):- primerTermino(H,P),
+								segundoTermino(H,S),
+								regresaTuplaPorIdInicio(S,M),
+								regresaNombre(M,J),
+								concat(P,'=>',D),
+								concat(D,J,A),
+								traduceRelacionesDeUnELemento(T,K),
+								append([A],K,Y),!.
+
 rb(Y):- Y = [
 	[id=>c1, id_padre=>c0, [nombre=>animal ,vida=>finita, ojos=>2],[odia=>o2]],
 	[id=>o2, id_padre=>c1, [nombre=>'estrella de mar',ojos=>0, movimiento=>arrastra],[odia=>o13, ama=>c20]], 
