@@ -315,3 +315,31 @@ rb(Y):- Y = [
 	[id=>c22, id_padre=>c11, [nombre=>'pez volador', movimiento=>vuela], [come=>o3]],
 	[id=>o23, id_padre=>c22, [nombre=>flippy, fama=>mucha], []]
 ].
+
+
+
+comeLista([],X,Y):- Y = [].
+comeLista([H|T],X,Y):-
+								primerTermino(H,L), 
+								X==L,
+								write('1Este Termino: "'), write(H), write('" si lo quiero borrar') , nl,
+								write('1Me voy con: "'), write(T), write('" a la siguente iteracion') , nl,
+								comeLista(T,X,R), 
+								Y = R,!; 
+								write('2Me voy con: "'), write(T), write('" a la siguente iteracion') , nl,
+								comeLista(T,X,R), 
+								append([H],R,Y),!.
+
+
+								borraPropiedadesRepetidas([nombre=>animal ,vida=>finita, ojos=>2, nombre=>'estrella de mar',ojos=>0, movimiento=>arrastra,nombre=>gusano, ojos=>0, movimiento=>arrastra,nombre=>oviparo,nace=>huevo],Y).
+
+
+
+								borraPropiedadesRepetidas([],Y):- Y = [].
+borraPropiedadesRepetidas([H|T],Y):- primerTermino(H,L),
+								write('L:'), write(L), nl,
+								borraPropiedadDeListaDePropiedades(T,L,R),
+								write('R:'), write(R), nl,
+								borraPropiedadesRepetidas(R,P),
+								write('P:'), write(P), nl,
+								append([H],P,Y), !.
