@@ -10,11 +10,49 @@ anadeClase(Nom,Pad) :-
 	atomic_concat(c,I,Id),
 	Pr = [nombre=>Nom],
 	Clase = [id=>Id,IdPad,Pr,[]],
-	sustPadre(IdPad,X,id_padre=>Id),
+	%sustPadre(IdPad,X,id_padre=>Id),
 	reverse(X,Y),
 	Z = [Clase|Y],
 	reverse(Z,S),
 	guardarBD(S).
+% Recibe el Nombre, el Padre, y las listas de Props y Rels
+anadeClase(Nom,Pad,Props,Rels) :-
+	rb(X),
+	quieroClase(Pad,X,Cla),
+	nth0(0,Cla,IdP),
+	segundoTermino(IdP,IdPa),
+	IdPad = id_padre=>IdPa,
+	nuevoId(I),
+	atomic_concat(c,I,Id),
+	Pr = [nombre=>Nom|Props], [H|T] = Rels,
+	Clase = [id=>Id,IdPad,Pr,Rels],
+	%sustPadre(IdPad,X,id_padre=>Id),
+	reverse(X,Y),
+	Z = [Clase|Y],
+	reverse(Z,S),
+	guardarBD(S).
+
+
+% Recibe un Nombre de la nueva clase, el que sería su padre, y el hijo.
+anadeClase(Nom,Pad, H) :-
+	rb(X),
+	quieroClase(Pad,X,Cla),
+	nth0(0,Cla,IdP),
+	segundoTermino(IdP,IdPa),
+	IdPad = id_padre=>IdPa,
+	nuevoId(I),
+	atomic_concat(c,I,Id),
+	Pr = [nombre=>Nom],
+	Clase = [id=>Id,IdPad,Pr,[]],
+	%sustPadre(IdPad,X,id_padre=>Id),
+	%reverse(X,Y),
+	%Z = [Clase|Y],
+	%reverse(Z,S),
+	quieroClase(H,X,Hi),
+	select(IdPad,Hi,id_padre=>Id,Hij),!,
+	select(Hi,X,Hij,Y),
+	proper_length(Y,L), nth0(L,Z,Clase,Y),
+	guardarBD(Z).
 % Recibe el Nombre, el Padre, y las listas de Props y Rels
 anadeClase(Nom,Pad,Props,Rels) :-
 	rb(X),
@@ -106,7 +144,7 @@ nuevoId(Id) :-
 	segundoTermino(A,Idmax),
 	atom_length(Idmax, Len),
 	L is Len - 1,
-	sub_atom(Idmax, 1, L, A, S),
+	sub_atom(Idmax, 1, L, Z, S),
 	atom_number(S,S1), 
 	Id is S1 + 1.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
