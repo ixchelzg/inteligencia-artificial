@@ -315,3 +315,102 @@ rb(Y):- Y = [
 	[id=>c22, id_padre=>c11, [nombre=>'pez volador', movimiento=>vuela], [come=>o3]],
 	[id=>o23, id_padre=>c22, [nombre=>flippy, fama=>mucha], []]
 ].
+
+
+
+comeLista([],X,Y):- Y = [].
+comeLista([H|T],X,Y):-
+								primerTermino(H,L), 
+								X==L,
+								write('1Este Termino: "'), write(H), write('" si lo quiero borrar') , nl,
+								write('1Me voy con: "'), write(T), write('" a la siguente iteracion') , nl,
+								comeLista(T,X,R), 
+								Y = R,!; 
+								write('2Me voy con: "'), write(T), write('" a la siguente iteracion') , nl,
+								comeLista(T,X,R), 
+								append([H],R,Y),!.
+
+
+								borraPropiedadesRepetidas([nombre=>animal ,vida=>finita, ojos=>2, nombre=>'estrella de mar',ojos=>0, movimiento=>arrastra,nombre=>gusano, ojos=>0, movimiento=>arrastra,nombre=>oviparo,nace=>huevo],Y).
+
+
+
+								borraPropiedadesRepetidas([],Y):- Y = [].
+borraPropiedadesRepetidas([H|T],Y):- primerTermino(H,L),
+								write('L:'), write(L), nl,
+								borraPropiedadDeListaDePropiedades(T,L,R),
+								write('R:'), write(R), nl,
+								borraPropiedadesRepetidas(R,P),
+								write('P:'), write(P), nl,
+								append([H],P,Y), !.
+
+
+
+
+								rb(Y):- Y = [
+	[id=>c1, id_padre=>c0, [nombre=>animal ,vida=>finita, ojos=>2],[odia=>o2]],
+	[id=>o2, id_padre=>c1, [nombre=>'estrella de mar',ojos=>0, movimiento=>arrastra],[odia=>o13, ama=>c20]], 
+	[id=>o3, id_padre=>c1, [nombre=>gusano, ojos=>0, movimiento=>arrastra],[]],
+	[id=>c4, id_padre=>c1, [nombre=>oviparo,nace=>huevo],[odia=>c6]],
+	[id=>o5, id_padre=>c4, [nombre=>hormiga, carga=>mucho, ojos=>100], [come=>o3]],
+	[id=>c6, id_padre=>c1, [nombre=>viviparo, nace=>placenta],[odia=>c4]],
+	[id=>o7, id_padre=>c6, [nombre=>mosca, movimiento=>vuela], [come=>o3]],
+	[id=>o8, id_padre=>c6, [nombre=>delfin, movimiento=>nada], []],
+	[id=>c9, id_padre=>c4, [nombre=>ave, movimiento=>vuela], []],
+	[id=>o10, id_padre=>c9, [nombre=>phoenix, vida=>infinita], [come=>o13]],
+	[id=>c11, id_padre=>c4, [nombre=>pez, movimiento=>nada], [odia=>o13]],
+	[id=>c12, id_padre=>c6, [nombre=>mamifero, movimiento=>corre],[]],
+	[id=>o13, id_padre=>c12, [nombre=>leon, arma=>garras], [come=>c20]],
+	[id=>c14, id_padre=>c9, [nombre=>pato, movimiento=>nada],[come=>c11]],
+	[id=>o15, id_padre=>c14, [nombre=>hugo, color=>rojo], [hermano=>o16]],
+	[id=>o16, id_padre=>c14, [nombre=>paco, color=>azul], [hermano=>o17]],
+	[id=>o17, id_padre=>c14, [nombre=>luis, color=>verde], []],
+	[id=>c18, id_padre=>c9, [nombre=>aguila, movimiento=>vuela, arma=>garras],[]],
+	[id=>o19, id_padre=>c18, [nombre=>'aguila calva', pelo=>no], []],
+	[id=>c20, id_padre=>c9, [nombre=>pinguino, movimiento=>nada], [come=>c11]],
+	[id=>c21, id_padre=>c11, [nombre=>huachinango, movimiento=>nada, sabor=>delicioso],[]],
+	[id=>c22, id_padre=>c11, [nombre=>'pez volador', movimiento=>vuela], [come=>o3]],
+	[id=>o23, id_padre=>c22, [nombre=>flippy, fama=>mucha], []]
+].
+
+
+
+
+regresaTuplaPorNombre(X,W,S),
+								regresaRelaciones(S,J),
+								J=[H|T],
+								relacionesHeredadasDeUnArticuloInicio(X,K),
+								append(H,K,G),
+								append(['nombre=>'],[X],F)
+								append(F,G,Y),
+
+								write('Y: '), write(Y), nl, 
+								!.
+
+
+
+								rb(Y):- Y = [
+	[id=>c1, id_padre=>c0, [nombre=>animal ,vida=>finita, ojos=>2],[odia=>o2]],
+	[id=>o2, id_padre=>c1, [nombre=>'estrella de mar',ojos=>0, movimiento=>arrastra],[odia=>o13, ama=>c20]], 
+	[id=>o3, id_padre=>c1, [nombre=>gusano, ojos=>0, movimiento=>arrastra],[]],
+	[id=>c4, id_padre=>c1, [nombre=>oviparo,nace=>huevo],[odia=>c6]],
+	[id=>o5, id_padre=>c4, [nombre=>hormiga, carga=>mucho, ojos=>100], [come=>o3]],
+	[id=>c6, id_padre=>c1, [nombre=>viviparo, nace=>placenta],[odia=>c4]],
+	[id=>o7, id_padre=>c6, [nombre=>mosca, movimiento=>vuela], [come=>o3]],
+	[id=>o8, id_padre=>c6, [nombre=>delfin, movimiento=>nada], []],
+	[id=>c9, id_padre=>c4, [nombre=>ave, movimiento=>vuela], []],
+	[id=>o10, id_padre=>c9, [nombre=>phoenix, vida=>infinita], [come=>o13]],
+	[id=>c11, id_padre=>c4, [nombre=>pez, movimiento=>nada], [odia=>o13]],
+	[id=>c12, id_padre=>c6, [nombre=>mamifero, movimiento=>corre],[]],
+	[id=>o13, id_padre=>c12, [nombre=>leon, arma=>garras], [come=>c20]],
+	[id=>c14, id_padre=>c9, [nombre=>pato, movimiento=>nada],[come=>c11]],
+	[id=>o15, id_padre=>c14, [nombre=>hugo, color=>rojo], [hermano=>o16]],
+	[id=>o16, id_padre=>c14, [nombre=>paco, color=>azul], [hermano=>o17]],
+	[id=>o17, id_padre=>c14, [nombre=>luis, color=>verde], []],
+	[id=>c18, id_padre=>c9, [nombre=>aguila, movimiento=>vuela, arma=>garras],[]],
+	[id=>o19, id_padre=>c18, [nombre=>'aguila calva', pelo=>no], []],
+	[id=>c20, id_padre=>c9, [nombre=>pinguino, movimiento=>nada], [come=>c11]],
+	[id=>c21, id_padre=>c11, [nombre=>huachinango, movimiento=>nada, sabor=>delicioso],[]],
+	[id=>c22, id_padre=>c11, [nombre=>'pez volador', movimiento=>vuela], [come=>o3]],
+	[id=>o23, id_padre=>c22, [nombre=>flippy, fama=>mucha], []]
+].
