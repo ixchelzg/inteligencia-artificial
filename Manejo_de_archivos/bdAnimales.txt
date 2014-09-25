@@ -9,7 +9,7 @@
 	[id=>o8, 	id_padre=>c7, 	[nombre=>phoenix, 						vida=>infinita								], []],
 	[id=>c9, 	id_padre=>c3, 	[nombre=>pez, 							movimiento=>nada							], [come=>o2]],
 	[id=>c10, 	id_padre=>c5, 	[nombre=>mamifero,						bebe=>leche 								], []],
-	[id=>c11, 	id_padre=>c10, 	[nombre=>leon, 							armas=>garras								], []],
+	[id=>c11, 	id_padre=>c10, 	[nombre=>leon, 							armas=>garras								], [odia=>o16]],
 	[id=>o12, 	id_padre=>c11, 	[nombre=>simba, 						traumas=>muchos								], []],
 	[id=>o13, 	id_padre=>c10, 	[nombre=>flipper, 						movimiento=>nada							], []],
 	[id=>c14, 	id_padre=>c7, 	[nombre=>pato, 							movimiento=>todoterreno						], []],
