@@ -75,7 +75,7 @@ regresaTuplaPorId(X,[H|T],Y):- regresaId(H,S),
 % La extensión de una clase (el conjunto de todos los objetos que pertenecen a la misma, ya sea porque se declaren directamente o porque están en la cerradura de la relación de herencia).
 % Ej.
 % ?- extensionDeUnaClaseInicio(ave,Y).
-% Y = [phoenix, hugo, paco, luis, 'aguila calva'].
+% Y = [phoenix, hugo, paco, luis, pingu].
 
 % Regresa todos los objetos hijos directos o indirectos de una clase dada.
 extensionDeUnaClaseInicio(X,Y):- rb(W), 
@@ -110,7 +110,7 @@ extensionDeUnaClase(X,[H|T],Y):-
 % 1b Regresa la extensión de una propiedad. 
 % La extensión de una propiedad (mostrar todos los objetos que tienen una propiedad específica ya sea por declaración directa o por herencia, incluyendo su respectivo valor).
 % Ej. buscaPropiedadEnlistaDePropiedadesDeObjetosInicio(vida,Y).
-% Y = ['estrella de mar: vida=>finita', 'gusano: vida=>finita', 'hormiga: vida=>finita', 'mosca: vida=>finita', 'delfin: vida=>finita', 'phoenix: vida=>infinita', 'leon: vida=>finita', 'hugo: vida=>finita', 'paco: vida=>finita', 'luis: vida=>finita', 'aguila calva: vida=>finita', 'flippy: vida=>finita'].
+% Y = ['gusano: vida=>finita', 'hormiga atomica: vida=>finita', 'la mosca: vida=>finita', 'phoenix: vida=>infinita', 'simba: vida=>finita', 'flipper: vida=>finita', 'hugo: vida=>finita', 'paco: vida=>finita', 'luis: vida=>finita', 'pingu: vida=>finita'].
 
 % Regresa las propiedades Heredadas de un elemenmto de la base de datos, se detiene al llegar al elemento raiz.
 propiedadesHeredadasDeUnArticuloInicio(X,Y):- rb(W),
@@ -190,7 +190,10 @@ buscaPropiedadEnlistaDePropiedadesDeObjetos(X,[H|T],Y):-
 % 1c Regresa la extensión de una relación. 
 % La extensión de una relación (mostrar todos los objetos que tienen una relación específica ya sea por declaración directa o por herencia, incluyendo con quién estén relacionados).
 % Ej. ?- buscaRelacionEnlistaDeRelacionesDeObjetosInicio(come,Y).
-% Y = ['hormiga: come=>gusano', 'mosca: come=>gusano', 'phoenix: come=>leon', 'leon: come=>pinguino', 'hugo: come=>pez', 'paco: come=>pez', 'luis: come=>pez', 'flippy: come=>gusano'].
+% Y = ['phoenix: come=>gusano', 'hugo: come=>gusano', 'paco: come=>gusano', 'luis: come=>gusano', 'pingu: come=>pez', 'pingu: come=>pez payaso', 'pingu: come=>nemo'].
+%Ej. ?- buscaRelacionEnlistaDeRelacionesDeObjetosInicio(odia,Y).
+%Y = ['hormiga atomica: odia=>viviparo', 'hormiga atomica: odia=>la mosca', 'hormiga atomica: odia=>mamifero', 'hormiga atomica: odia=>leon', 'hormiga atomica: odia=>simba', 'hormiga atomica: odia=>flipper', 'la mosca: odia=>oviparo', 'la mosca: odia=>hormiga atomica', 'la mosca: odia=>ave', 'la mosca: odia=>phoenix', 'la mosca: odia=>pato', 'la mosca: odia=>hugo', 'la mosca: odia=>paco', 'la mosca: odia=>luis', 'la mosca: odia=>pinguino', 'la mosca: odia=>pingu', 'la mosca: odia=>pez', 'la mosca: odia=>pez payaso', 'la mosca: odia=>nemo', 'phoenix: odia=>viviparo', 'phoenix: odia=>la mosca', 'phoenix: odia=>mamifero', 'phoenix: odia=>leon', 'phoenix: odia=>simba', 'phoenix: odia=>flipper', 'simba: odia=>oviparo', 'simba: odia=>hormiga atomica', 'simba: odia=>ave', 'simba: odia=>phoenix', 'simba: odia=>pato', 'simba: odia=>hugo', 'simba: odia=>paco', 'simba: odia=>luis', 'simba: odia=>pinguino', 'simba: odia=>pingu', 'simba: odia=>pez', 'simba: odia=>pez payaso', 'simba: odia=>nemo', 'flipper: odia=>oviparo', 'flipper: odia=>hormiga atomica', 'flipper: odia=>ave', 'flipper: odia=>phoenix', 'flipper: odia=>pato', 'flipper: odia=>hugo', 'flipper: odia=>paco', 'flipper: odia=>luis', 'flipper: odia=>pinguino', 'flipper: odia=>pingu', 'flipper: odia=>pez', 'flipper: odia=>pez payaso', 'flipper: odia=>nemo', 'hugo: odia=>viviparo', 'hugo: odia=>la mosca', 'hugo: odia=>mamifero', 'hugo: odia=>leon', 'hugo: odia=>simba', 'hugo: odia=>flipper', 'paco: odia=>viviparo', 'paco: odia=>la mosca', 'paco: odia=>mamifero', 'paco: odia=>leon', 'paco: odia=>simba', 'paco: odia=>flipper', 'luis: odia=>viviparo', 'luis: odia=>la mosca', 'luis: odia=>mamifero', 'luis: odia=>leon', 'luis: odia=>simba', 'luis: odia=>flipper', 'pingu: odia=>viviparo', 'pingu: odia=>la mosca', 'pingu: odia=>mamifero', 'pingu: odia=>leon', 'pingu: odia=>simba', 'pingu: odia=>flipper'].
+
 
 % regresa todas las relaciones con el descriptor en formato 'nombre_elemento: relacion=>elemento'
 regresaLasRelaciones(N,X,[],Y):- Y = [],!.
@@ -282,7 +285,7 @@ clasesPadresDeUnObjeto(X,Y):- rb(W),
 % Y = [nombre=>phoenix, vida=>infinita, movimiento=>vuela, nace=>huevo, ojos=>2].
 % Para clase.
 % Ej.?- propiedadesMonotonicasHeredadasYPropiasDeUnElemento(pato,Y).
-% Y = [nombre=>pato, movimiento=>nada, nace=>huevo, vida=>finita, ojos=>2].
+% Y = [nombre=>pato, movimiento=>todoterreno, nace=>huevo, ojos=>2, vida=>finita].
 
 % Regresa propiedades heredadas de un elemento cualquiera de la base de datos.
 propiedadesHeredadasDeUnElementoInicio(X,Y):- rb(W),
@@ -329,10 +332,10 @@ borraPropiedadesRepetidasDeUnElemento([H|T],Y):- primerTermino(H,L),
 % Todas las relaciones de un objeto o clase
 % Para objeto.
 % Ej.?- relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(hugo,Y).
-% Y = ['hermano=>paco', 'come=>pez', 'odia=>viviparo'].
+% Y = Y = ['hermano=>paco', 'hermano=>luis', 'come=>gusano', 'odia=>viviparo', 'odia=>la mosca', 'odia=>mamifero', 'odia=>leon', 'odia=>simba', 'odia=>flipper'].
 % Para clase.
 % Ej.?- relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(pato,Y).
-% Y = ['come=>pez', 'odia=>viviparo'].
+% Y = ['come=>gusano', 'odia=>viviparo', 'odia=>la mosca', 'odia=>mamifero', 'odia=>leon', 'odia=>simba', 'odia=>flipper'].
 
 % Regresa la lista de propiedades según la ley de monoticidad (con nombre en vez de id).
 relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(X,Y):- relacionesPropiasYHeredadasDeUnElementoInicio(X,S),
