@@ -10,8 +10,8 @@
 main:- consult('../Manejo_de_archivos/main.pl'),
 	consult('eliminar.pl'), consult('modificar.pl'), consult('agregar.pl'), consult('consultar.pl').
 	
-rb(Y):- open_kb('../Manejo_de_archivos/bdSistemaSolar.txt',Y).
-guardarBD(Y):- save_kb('../Manejo_de_archivos/bdSistemaSolar1.txt',Y).
+rb(Y):- open_kb('../Manejo_de_archivos/bdAnimales.txt',Y).
+guardarBD(Y):- save_kb('../Manejo_de_archivos/bdAnimales.txt',Y).
 
 % Regresan ya sea el lado izquierdo o derecho del operador (siempre y cuando estos sean átomos).
 primerTermino(X,Y) :- X = =>(Y,W).

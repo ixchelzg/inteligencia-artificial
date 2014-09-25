@@ -1,7 +1,7 @@
 elimina(X):-
 	rb(W),
 	quieroClase(X,W,P),
-	nth0(2,P,Pr), nth0(3,P,Rel), cola(Pr,Props), valor(id_padre,P,Pop), valor(id,P,ID),
+	nth0(2,P,Pr), nth0(3,P,Rel), cola(Pr,Props),valor(id_padre,P,Pop),valor(id,P,ID), 
 	Pop\=c0, %si no es la clase raiz
 	crearNuevaListaInicio(ID,Props,Rel,Pop),
 	rb(W1),

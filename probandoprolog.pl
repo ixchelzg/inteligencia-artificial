@@ -4,7 +4,7 @@
 main:- consult('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/main.pl'),
 	consult('/home/ixchel/git/UNAM/IA/Proyecto/eliminar.pl'),
 	consult('/home/ixchel/git/UNAM/IA/Proyecto/modificar.pl').
-	
+
 rb(Y):- open_kb('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/bd.txt',Y).
 guardarBD(Y):- save_kb('/home/ixchel/git/UNAM/IA/Proyecto/Manejo_de_archivos/bd.txt',Y).
 
