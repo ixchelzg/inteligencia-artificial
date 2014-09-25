@@ -227,6 +227,7 @@ haceListaDeRelacionesParaTodosLosObjetos([H|T],Y):- regresaId(H,I),
 								C == 'o',
 								regresaNombre(H,P),
 								relacionesMonotonicasHeredadasYPropiasDeUnArticulo(P,R),
+								write('R: '), write(R), nl,
 								haceListaDeRelacionesParaTodosLosObjetos(T,S),
 								append([R],S,Y),!
 								;
