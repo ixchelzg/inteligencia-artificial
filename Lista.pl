@@ -76,6 +76,8 @@ regresaTuplaPorId(X,[H|T],Y):- regresaId(H,S),
 % Ej.
 % ?- extensionDeUnaClaseInicio(ave,Y).
 % Y = [phoenix, hugo, paco, luis, pingu].
+% Ej. ?- extensionDeUnaClaseInicio(pato,Y).
+% Y = [hugo, paco, luis].
 
 % Regresa todos los objetos hijos directos o indirectos de una clase dada.
 extensionDeUnaClaseInicio(X,Y):- rb(W), 
@@ -387,7 +389,6 @@ todasLasRelacionesDeUnELemento([H|T],Y):-
 								transformaInicio(Q,V,B,U),
 								append(U,G,Y),
 								!.
-
 
 % Elimina una relación de una lista de realciones.
 quitaRelacion(X,[],Y):- Y = [], !.
