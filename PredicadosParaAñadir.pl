@@ -70,7 +70,7 @@ anadeClase(Nom,Pad,Props,Rels) :-
 	reverse(Z,S),
 	guardarBD(S).
 
-% Recibe el Nombre del Objeto, y quien sería su Padre
+% Recibe el Nombre del Objeto, y quien sería su Padre 
 anadeObjeto(Nom,Pad) :-
 	rb(X),
 	quieroClase(Pad,X,Cla),
