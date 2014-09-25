@@ -1,8 +1,30 @@
+
+:- op(15, xfx, '=>').
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 esCorrecto([]).
 esCorrecto([H|T]) :-
 	H = =>(X,Y),
 	esCorrecto(T).
+
+existeInicio(X) :-
+	rb(W), existe(X,W).
+existe(X,[]) :- false.
+existe(X,[H|T]) :-
+	nth0(0,H,H1),
+	segundoTermino(H1, S),
+	X==S,!;
+	existe(X,T),!.
+
+verificaLista([]).
+verificaLista([H|T]) :-
+	segundoTermino(H,S),
+	existeInicio(S),
+	verificaLista(T),!;
+	segundoTermino(H,S),
+	\+existeInicio(S),
+	nl, write('No es posible '), write(S), write(' en '), write(H),false,!.
+
 
 nuevoId(Id) :-
 	rb(X),
@@ -55,6 +77,7 @@ anadeClase(Nom,Pad,H,Props,Rels) :-
 	Pro = [nombre=>Nom|Props], set(Pro,Pr),
 	([U|T] = Rels -> true; nl,write('Relaciones no puede ser vacia'),nl, false),
 	(esCorrecto(Rels) -> true; nl,write('Escribe las relaciones de la forma x=>y'),nl,false),
+	verificaLista(Rels),
 	Clase = [id=>Id,IdPad,Pr,Rela],
 	quieroClase(H,X,Hi),
 	select(IdPad,Hi,id_padre=>Id,Hij),!,
@@ -95,6 +118,7 @@ anadeClase(Nom,Pad,Props,Rels) :-
 	Pro = [nombre=>Nom|Props], set(Pro,Pr),
 	([U|T] = Rels -> true; nl,write('Relaciones no puede ser vacia'),nl, false),
 	(esCorrecto(Rels) -> true; nl,write('Escribe las relaciones de la forma x=>y'),nl,false),
+	verificaLista(Rels),
 	Clase = [id=>Id,IdPad,Pr,Rels],
 	proper_length(X,L), nth0(L,Z,Clase,X),
 	guardarBD(Z).
@@ -130,6 +154,7 @@ anadeObjeto(Nom,Pad,Props,Rels) :-
 	Pro = [nombre=>Nom|Props], set(Pro,Pr),
 	([U|T] = Rels -> true; nl,write('Relaciones no puede ser vacia'),nl, false),
 	(esCorrecto(Rels) -> true; nl,write('Escribe las relaciones de la forma x=>y'),nl,false),
+	verificaLista(Rels),
 	Clase = [id=>Id,IdPad,Pr,Rels],
 	proper_length(X,L), nth0(L,Z,Clase,X),
 	guardarBD(Z).
@@ -150,8 +175,10 @@ anadePropiedad(Nom,Props) :-
 
 % Lo mismo pero para Relaciones
 anadeRelacion(Nom,Rels) :-
-	rb(X), [H|T] = Rels,
+	rb(X), 
+	([H|T] = Rels -> true; nl,write('Relaciones no puede ser vacia'),nl, false),
 	(esCorrecto(Rels) -> true; nl,write('Escribe las relaciones de la forma x=>y'),nl,false),
+	verificaLista(Rels),
 	quieroClase(Nom,X,Cla),
 	([] \= Cla -> true; nl,write('Esa Clase u Objeto no existe'),nl,false),
 	nth0(3,Cla,Re),
