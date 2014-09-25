@@ -1,0 +1,372 @@
+% 1a Regresa la extensión de una clase. 
+% La extensión de una clase (el conjunto de todos los objetos que pertenecen a la misma, ya sea porque se declaren directamente o porque están en la cerradura de la relación de herencia).
+% Ej.
+% ?- extensionDeUnaClaseInicio(ave,Y).
+% Y = [phoenix, hugo, paco, luis, pingu].
+
+% Regresa todos los objetos hijos directos o indirectos de una clase dada.
+extensionDeUnaClaseInicio(X,Y):- rb(W), 
+								regresaTuplaPorNombre(X,W,S), 
+								regresaId(S,L), 
+								extensionDeUnaClase(L,W,Y),!.
+extensionDeUnaClase(X,[],Y):- Y = [].
+extensionDeUnaClase(X,[H|T],Y):- 
+								regresaId_padre(H,S), 
+								X==S,
+								regresaNombre(H,N),
+								regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'c',
+								extensionDeUnaClaseInicio(N,P),
+								extensionDeUnaClase(X,T,R), 
+								append(P,R,Y),!
+								;
+								regresaId_padre(H,S), 
+								X==S,
+								regresaNombre(H,N),
+								regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								extensionDeUnaClase(X,T,R), 
+								append([N],R,Y),!
+								; 
+								extensionDeUnaClase(X,T,Y),!.
+
+% 1b Regresa la extensión de una propiedad. 
+% La extensión de una propiedad (mostrar todos los objetos que tienen una propiedad específica ya sea por declaración directa o por herencia, incluyendo su respectivo valor).
+% Ej. buscaPropiedadEnlistaDePropiedadesDeObjetosInicio(vida,Y).
+% Y = ['gusano: vida=>finita', 'hormiga atomica: vida=>finita', 'la mosca: vida=>finita', 'phoenix: vida=>infinita', 'simba: vida=>finita', 'flipper: vida=>finita', 'hugo: vida=>finita', 'paco: vida=>finita', 'luis: vida=>finita', 'pingu: vida=>finita'].
+
+% Regresa las propiedades Heredadas de un elemenmto de la base de datos, se detiene al llegar al elemento raiz.
+propiedadesHeredadasDeUnArticuloInicio(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId_padre(S,L), 
+								L \= c0,
+								regresaTuplaPorId(L,W,N),
+								regresaNombre(N,M),
+								regresaPropiedades(N,J),
+								propiedadesHeredadasDeUnArticuloInicio(M,K),
+								append(J,K,Y),!
+								;
+								Y = [].
+
+% Regresa las propiedades Heredadas y propias de un elemento de la base de datos.
+propiedadesHeredadasYPropiasDeUnArticulo(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaPropiedades(S,J),
+								propiedadesHeredadasDeUnArticuloInicio(X,K),
+								append(J,K,Y), !.
+
+% Regresa la lista de propiedade según la ley de monoticidad.
+propiedadesMonotonicasHeredadasYPropiasDeUnArticulo(X,Y):- propiedadesHeredadasYPropiasDeUnArticulo(X,S),
+								borraPropiedadesRepetidas(S,Y).
+
+% Borra una propiedad de la lista de propiedades.
+borraPropiedadDeListaDePropiedades([],X,Y):- Y = [].
+borraPropiedadDeListaDePropiedades([H|T],X,Y):-primerTermino(H,L), 
+								X==L,
+								borraPropiedadDeListaDePropiedades(T,X,R), 
+								Y = R,!
+								; 
+								borraPropiedadDeListaDePropiedades(T,X,R), 
+								append([H],R,Y),!.
+
+% Borra las propiedades repetidas de una lista dando preferencia a las de lo hijos sobre las de los padres. (asi aseguramos Monoticidad).
+borraPropiedadesRepetidas([],Y):- Y = [].
+borraPropiedadesRepetidas([H|T],Y):- primerTermino(H,L),
+								borraPropiedadDeListaDePropiedades(T,L,R),
+								borraPropiedadesRepetidas(R,P),
+								append([H],P,Y), !.
+
+% Regresa lista de propiedades (ya sin repetidos) para todos los Objetos de la base de datos.
+haceListaDePropiedadesParaTodosLosObjetosInicio(Y):- rb(W), 
+								haceListaDePropiedadesParaTodosLosObjetos(W,Y).
+haceListaDePropiedadesParaTodosLosObjetos([],Y):- Y = [].
+haceListaDePropiedadesParaTodosLosObjetos([H|T],Y):- regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								regresaNombre(H,P),
+								propiedadesMonotonicasHeredadasYPropiasDeUnArticulo(P,R),
+								haceListaDePropiedadesParaTodosLosObjetos(T,S),
+								append([R],S,Y),!
+								;
+								regresaNombre(H,P),
+								haceListaDePropiedadesParaTodosLosObjetos(T,S),
+								Y = S,!.
+
+% Busca una propiedad en particular en una lista de propiedades pára cada Objeto, lo regresa en el formato 'nombre_objeto: propiedad=>valor', hace esto para cada objeto de la base de datos por lo que al final regresa un lista.
+buscaPropiedadEnlistaDePropiedadesDeObjetosInicio(X,Y):-haceListaDePropiedadesParaTodosLosObjetosInicio(W), 
+								buscaPropiedadEnlistaDePropiedadesDeObjetos(X,W,Y).
+buscaPropiedadEnlistaDePropiedadesDeObjetos(X,[],Y):- Y = [],!.
+buscaPropiedadEnlistaDePropiedadesDeObjetos(X,[H|T],Y):- 
+								valor(X,H,S),
+								valor(nombre,H,U),
+								buscaPropiedadEnlistaDePropiedadesDeObjetos(X,T,M),
+								concat(U,': ',N),
+								concat(N,X,L),
+								concat(L,'=>',D),
+								concat(D,S,A),
+								append([A],M,Y),!
+								;
+								buscaPropiedadEnlistaDePropiedadesDeObjetos(X,T,M), 
+								Y = M,!.
+
+% 1c Regresa la extensión de una relación. 
+% La extensión de una relación (mostrar todos los objetos que tienen una relación específica ya sea por declaración directa o por herencia, incluyendo con quién estén relacionados).
+% Ej. ?- buscaRelacionEnlistaDeRelacionesDeObjetosInicio(come,Y).
+% Y = ['phoenix: come=>gusano', 'hugo: come=>gusano', 'paco: come=>gusano', 'luis: come=>gusano', 'pingu: come=>pez', 'pingu: come=>pez payaso', 'pingu: come=>nemo'].
+%Ej. ?- buscaRelacionEnlistaDeRelacionesDeObjetosInicio(odia,Y).
+%Y = ['hormiga atomica: odia=>viviparo', 'hormiga atomica: odia=>la mosca', 'hormiga atomica: odia=>mamifero', 'hormiga atomica: odia=>leon', 'hormiga atomica: odia=>simba', 'hormiga atomica: odia=>flipper', 'la mosca: odia=>oviparo', 'la mosca: odia=>hormiga atomica', 'la mosca: odia=>ave', 'la mosca: odia=>phoenix', 'la mosca: odia=>pato', 'la mosca: odia=>hugo', 'la mosca: odia=>paco', 'la mosca: odia=>luis', 'la mosca: odia=>pinguino', 'la mosca: odia=>pingu', 'la mosca: odia=>pez', 'la mosca: odia=>pez payaso', 'la mosca: odia=>nemo', 'phoenix: odia=>viviparo', 'phoenix: odia=>la mosca', 'phoenix: odia=>mamifero', 'phoenix: odia=>leon', 'phoenix: odia=>simba', 'phoenix: odia=>flipper', 'simba: odia=>oviparo', 'simba: odia=>hormiga atomica', 'simba: odia=>ave', 'simba: odia=>phoenix', 'simba: odia=>pato', 'simba: odia=>hugo', 'simba: odia=>paco', 'simba: odia=>luis', 'simba: odia=>pinguino', 'simba: odia=>pingu', 'simba: odia=>pez', 'simba: odia=>pez payaso', 'simba: odia=>nemo', 'flipper: odia=>oviparo', 'flipper: odia=>hormiga atomica', 'flipper: odia=>ave', 'flipper: odia=>phoenix', 'flipper: odia=>pato', 'flipper: odia=>hugo', 'flipper: odia=>paco', 'flipper: odia=>luis', 'flipper: odia=>pinguino', 'flipper: odia=>pingu', 'flipper: odia=>pez', 'flipper: odia=>pez payaso', 'flipper: odia=>nemo', 'hugo: odia=>viviparo', 'hugo: odia=>la mosca', 'hugo: odia=>mamifero', 'hugo: odia=>leon', 'hugo: odia=>simba', 'hugo: odia=>flipper', 'paco: odia=>viviparo', 'paco: odia=>la mosca', 'paco: odia=>mamifero', 'paco: odia=>leon', 'paco: odia=>simba', 'paco: odia=>flipper', 'luis: odia=>viviparo', 'luis: odia=>la mosca', 'luis: odia=>mamifero', 'luis: odia=>leon', 'luis: odia=>simba', 'luis: odia=>flipper', 'pingu: odia=>viviparo', 'pingu: odia=>la mosca', 'pingu: odia=>mamifero', 'pingu: odia=>leon', 'pingu: odia=>simba', 'pingu: odia=>flipper'].
+
+
+% regresa todas las relaciones con el descriptor en formato 'nombre_elemento: relacion=>elemento'
+regresaLasRelaciones(N,X,[],Y):- Y = [],!.
+regresaLasRelaciones(N,X,[H|T],Y):- 
+								valor(X,[H],S),
+								regresaTuplaPorIdInicio(S,P),
+								regresaNombre(P,I),
+								regresaLasRelaciones(N,X,T,M),
+								concat(N,': ',U),
+								concat(U,X,L),
+								concat(L,'=>',D),
+								concat(D,I,A),
+								append([A],M,Y),!
+								;
+								regresaLasRelaciones(N,X,T,M),
+								Y = M,!.
+
+% Busca una relación en particular en una lista de propiedades pára cada Objeto, lo regresa en el formato 'nombre_objeto: relacion=>valor', hace esto para cada objeto de la base de datos por lo que al final regresa un lista.
+buscaRelacionEnlistaDeRelacionesDeObjetosInicio(X,Y):-haceListaDeRelacionesParaTodosLosObjetosInicio(W), 
+								buscaRelacionEnlistaDeRelacionesDeObjetos(X,W,Y).
+buscaRelacionEnlistaDeRelacionesDeObjetos(X,[],Y):- Y = [],!.
+buscaRelacionEnlistaDeRelacionesDeObjetos(X,[H|T],Y):- 
+								valor(nombre,H,I),
+								valor(X,H,S),
+								regresaLasRelaciones(I,X,H,F),
+								buscaRelacionEnlistaDeRelacionesDeObjetos(X,T,M),
+								append(F,M,Y),!
+								;
+								buscaRelacionEnlistaDeRelacionesDeObjetos(X,T,M), 
+								Y = M,!.
+
+% Regresa lista de relaciones (ya sin repetidos) para todos los Objetos de la base de datos.
+haceListaDeRelacionesParaTodosLosObjetosInicio(Y):- rb(W), 
+								haceListaDeRelacionesParaTodosLosObjetos(W,Y).
+
+haceListaDeRelacionesParaTodosLosObjetos([],Y):- Y = [].
+haceListaDeRelacionesParaTodosLosObjetos([H|T],Y):- regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								regresaNombre(H,P),
+								relacionesPropiasYHeredadasDeUnElementoInicio(P,R),
+								todasLasRelacionesDeUnELemento(R,N),
+								regresaNombreCompleto(H,K),
+								append([K],N,Q),
+								haceListaDeRelacionesParaTodosLosObjetos(T,S),
+								append([Q],S,Y),!
+								;
+								haceListaDeRelacionesParaTodosLosObjetos(T,S),
+								Y = S,!.
+
+% 1d Regresa las clases padres de un objeto.
+% Todas las clases a las que pertenece un objeto.
+% Ej.?- clasesPadresDeUnObjetoRevisado(hugo,Y).
+% Y = [pato, ave, oviparo, animal].
+%
+% Lanza mensaje si la entidad consultada no es un Objeto
+% Ej.?- clasesPadresDeUnObjetoRevisado(pato,Y).
+% pato no es un objeto
+% true.
+
+% Regresa las clases padres de un elemento de la base de datos cerciorandose que le identificador del elemento indique que es un objeto.
+clasesPadresDeUnObjetoRevisado(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId(S,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								clasesPadresDeUnObjeto(X,Y),!;
+								write(X),write(' no es un objeto'),nl,!
+								.
+
+% Regresa las clases padres de cualquier elemento en la base de datos.
+clasesPadresDeUnObjeto(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId_padre(S,L), 
+								L \= c0,
+								regresaTuplaPorId(L,W,N),
+								regresaNombre(N,M),
+								clasesPadresDeUnObjeto(M,K),
+								append([M],K,Y),!
+								;
+								Y = [].
+
+% 1e Regresa las propiedades tanto propias como heredadas de un elemento (clase u objeto indistintamente)
+% Todas las propiedades de un objeto o clase
+% Para objeto.
+% Ej.?- propiedadesMonotonicasHeredadasYPropiasDeUnElemento(phoenix,Y).
+% Y = [nombre=>phoenix, vida=>infinita, movimiento=>vuela, nace=>huevo, ojos=>2].
+% Para clase.
+% Ej.?- propiedadesMonotonicasHeredadasYPropiasDeUnElemento(pato,Y).
+% Y = [nombre=>pato, movimiento=>todoterreno, nace=>huevo, ojos=>2, vida=>finita].
+
+% Regresa propiedades heredadas de un elemento cualquiera de la base de datos.
+propiedadesHeredadasDeUnElementoInicio(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaId_padre(S,L), 
+								L \= c0,
+								regresaTuplaPorId(L,W,N),
+								regresaNombre(N,M),
+								regresaPropiedades(N,J),
+								propiedadesHeredadasDeUnElementoInicio(M,K),
+								append(J,K,Y),!
+								;
+								Y = [].
+
+% Regresa propiedades heredadas y propias de un elemento cualquiera de la base de datos.
+propiedadesHeredadasYPropiasDeUnElemento(X,Y):- rb(W),
+								regresaTuplaPorNombre(X,W,S),
+								regresaPropiedades(S,J),
+								propiedadesHeredadasDeUnElementoInicio(X,K),
+								append(J,K,Y), !.
+
+% Regresa la lista de propiedades según la ley de monoticidad.
+propiedadesMonotonicasHeredadasYPropiasDeUnElemento(X,Y):- propiedadesHeredadasYPropiasDeUnElemento(X,S),
+								borraPropiedadesRepetidasDeUnElemento(S,Y).
+
+% Borra una propiedad de la lista de propiedades.
+borraPropiedadDeListaDePropiedadesDeUnElemento([],X,Y):- Y = [].
+borraPropiedadDeListaDePropiedadesDeUnElemento([H|T],X,Y):-primerTermino(H,L), 
+								X==L,
+								borraPropiedadDeListaDePropiedadesDeUnElemento(T,X,R), 
+								Y = R,!
+								; 
+								borraPropiedadDeListaDePropiedadesDeUnElemento(T,X,R), 
+								append([H],R,Y),!.
+
+% Borra las propiedades repetidas de una lista dando preferencia a las de lo hijos sobre las de los padres. (asi aseguramos Monoticidad).
+borraPropiedadesRepetidasDeUnElemento([],Y):- Y = [].
+borraPropiedadesRepetidasDeUnElemento([H|T],Y):- primerTermino(H,L),
+								borraPropiedadDeListaDePropiedadesDeUnElemento(T,L,R),
+								borraPropiedadesRepetidasDeUnElemento(R,P),
+								append([H],P,Y), !.
+
+% 1f Regresa las relaciones tanto propias como heredadas de un elemento (clase u objeto indistintamente)
+% Todas las relaciones de un objeto o clase
+% Para objeto.
+% Ej.?- relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(hugo,Y).
+% Y = Y = ['hermano=>paco', 'hermano=>luis', 'come=>gusano', 'odia=>viviparo', 'odia=>la mosca', 'odia=>mamifero', 'odia=>leon', 'odia=>simba', 'odia=>flipper'].
+% Para clase.
+% Ej.?- relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(pato,Y).
+% Y = ['come=>gusano', 'odia=>viviparo', 'odia=>la mosca', 'odia=>mamifero', 'odia=>leon', 'odia=>simba', 'odia=>flipper'].
+
+% Regresa la lista de propiedades según la ley de monoticidad (con nombre en vez de id).
+relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(X,Y):- relacionesPropiasYHeredadasDeUnElementoInicio(X,S),
+								todasLasRelacionesDeUnELemento(S,P),
+								traduceRelacionesDeUnELemento(P,Y).
+
+% Regresa todos los objetos hijos directos o indirectos de una clase dada.
+todosLosDescendientesInicio(X,Y):- rb(W),  
+								todosLosDescendientes(X,W,Y),!.
+todosLosDescendientes(X,[],Y):- Y = [].
+todosLosDescendientes(X,[H|T],Y):- regresaId_padre(H,S), 
+								X==S,
+								regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'c',
+								todosLosDescendientesInicio(I,P),
+								todosLosDescendientes(X,T,R), 
+								append(P,R,G),
+								append([I],G,Y),!
+								;
+								regresaId_padre(H,S), 
+								X==S,
+								regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								todosLosDescendientes(X,T,R), 
+								append([I],R,Y),!
+								; 
+								todosLosDescendientes(X,T,Y),!.
+
+% Hace un lista con las clasve de relación mas su operador
+transformaInicio(Q,V,S,Y):- A = =>(Q,V),
+								transforma(Q,S,J),
+								append([A],J,Y),!.
+transforma(Q,[],Y):- Y=[], !.
+transforma(Q,[H|T],Y):- A = =>(Q,H),
+								transforma(Q,T,J),
+								append([A],J,Y),!.
+
+% Saca los objetos hijos de una relación para entonces contruir las relaciones por herencia.
+todasLasRelacionesDeUnELemento([],Y):- Y = [],!.
+todasLasRelacionesDeUnELemento([H|T],Y):-
+								primerTermino(H,Q),
+								segundoTermino(H,V),
+								todosLosDescendientesInicio(V,B),
+								todasLasRelacionesDeUnELemento(T,G),
+								transformaInicio(Q,V,B,U),
+								append(U,G,Y),
+								!.
+
+
+% Elimina una relación de una lista de realciones.
+quitaRelacion(X,[],Y):- Y = [], !.
+quitaRelacion(X,[H|T],Y):- primerTermino(X,Z), 
+								primerTermino(H,U), 
+								Z \= U,
+								quitaRelacion(X,T,G),
+								append([H],G,Y), !
+								;
+								primerTermino(X,Z),
+								primerTermino(H,U),
+								Z == U,
+								quitaRelacion(X,T,G),
+								Y = G,!.
+
+% Elimina las relaciones ya existentes de las nuevas.
+quitaRelacionesDePadresIgualsALasDeLosHijos([],W,Y):- Y = [].
+quitaRelacionesDePadresIgualsALasDeLosHijos(P,[],Y):- Y = P.
+quitaRelacionesDePadresIgualsALasDeLosHijos(W,[H|T],Y):-
+								quitaRelacion(H,W,G),
+								quitaRelacionesDePadresIgualsALasDeLosHijos(G,T,Y).
+
+% Regresa las relaciones propias y Heredadas de un elemento (Id)
+relacionesPropiasYHeredadasDeUnElementoInicio(X,Y):- regresaTuplaPorNombreInicio(X,S),
+								regresaRelaciones(S,J),
+								J=[H|T],
+								regresaId_padre(S,I),
+								relacionesPropiasYHeredadasDeUnElemento(I,H,Y).
+relacionesPropiasYHeredadasDeUnElemento(X,W,Y):-
+								regresaTuplaPorIdInicio(X,S),
+								regresaRelaciones(S,J),
+								regresaId_padre(S,K),
+								K \= c0,
+								J=[H|T],
+								quitaRelacionesDePadresIgualsALasDeLosHijos(H,W,N),
+								append(W,N,F),
+								relacionesPropiasYHeredadasDeUnElemento(K,F,Y),!
+								;
+								Y = W,!.						
+
+% Intercambia Ids por nombres en una lista de relaciones.
+traduceRelacionesDeUnELemento([],Y):- Y = []. 
+traduceRelacionesDeUnELemento([H|T],Y):- primerTermino(H,P),
+								segundoTermino(H,S),
+								regresaTuplaPorIdInicio(S,M),
+								regresaNombre(M,J),
+								concat(P,'=>',D),
+								concat(D,J,A),
+								traduceRelacionesDeUnELemento(T,K),
+								append([A],K,Y),!.
+
+% uso esto para poder picarle w en swi-prolog para que me de todas las respuestas.
+ho(hom).
+ho(bar).
+h(Y):- ho(Y). 
