@@ -52,3 +52,154 @@ rb(Y):- Y = [
 	[id=>c23, id_padre=>c1, [nombre=>pluton, color=>naranja,elemento=>fuego, signo=>escorpio], [mas_alejado_de=>c4]],
 	[id=>o24, id_padre=>c23, [nombre=>caronte, diametro=>'_1200km'], []]
 ].
+
+
+
+
+% 1f Regresa las relaciones tanto propias como heredadas de un elemento (clase u objeto indistintamente)
+% Todas las relaciones de un objeto o clase
+% Para objeto.
+% Ej.?- relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(hugo,Y).
+% Y = Y = ['hermano=>paco', 'hermano=>luis', 'come=>gusano', 'odia=>viviparo', 'odia=>la mosca', 'odia=>mamifero', 'odia=>leon', 'odia=>simba', 'odia=>flipper'].
+% Para clase.
+% Ej.?- relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(pato,Y).
+% Y = ['come=>gusano', 'odia=>viviparo', 'odia=>la mosca', 'odia=>mamifero', 'odia=>leon', 'odia=>simba', 'odia=>flipper'].
+
+% Regresa la lista de propiedades según la ley de monoticidad (con nombre en vez de id).
+relacionesMonotonicasHeredadasYPropiasDeUnElementoNombre(X,Y):- relacionesPropiasYHeredadasDeUnElementoInicio(X,S),
+								write('S3: '), write(S), nl,
+								todasLasRelacionesDeUnELemento(S,P),
+								write('P3: '), write(P), nl,
+								traduceRelacionesDeUnELemento(P,Y).
+
+% Regresa todos los objetos hijos directos o indirectos de una clase dada.
+todosLosDescendientesInicio(X,Y):- rb(W),  
+								todosLosDescendientes(X,W,Y),!.
+todosLosDescendientes(X,[],Y):- Y = [].
+todosLosDescendientes(X,[H|T],Y):- regresaId_padre(H,S), 
+								X==S,
+								regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'c',
+								todosLosDescendientesInicio(I,P),
+								todosLosDescendientes(X,T,R), 
+								append(P,R,G),
+								append([I],G,Y),!
+								;
+								regresaId_padre(H,S), 
+								X==S,
+								regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								todosLosDescendientes(X,T,R), 
+								append([I],R,Y),!
+								; 
+								todosLosDescendientes(X,T,Y),!.
+
+% Hace un lista con las clasve de relación mas su operador
+transformaInicio(Q,V,S,Y):- A = =>(Q,V),
+								transforma(Q,S,J),
+								append([A],J,Y),!.
+transforma(Q,[],Y):- Y=[], !.
+transforma(Q,[H|T],Y):- A = =>(Q,H),
+								transforma(Q,T,J),
+								append([A],J,Y),!.
+
+% Saca los objetos hijos de una relación para entonces contruir las relaciones por herencia.
+todasLasRelacionesDeUnELemento([],Y):- Y = [],!.
+todasLasRelacionesDeUnELemento([H|T],Y):-
+								write('H4: '), write(H), nl,
+								write('T4: '), write(T), nl,
+								primerTermino(H,Q),
+								write('Q4: '), write(Q), nl,
+								segundoTermino(H,V),
+								write('V4: '), write(V), nl,
+								todosLosDescendientesInicio(V,B),
+								write('B4: '), write(B), nl,
+								todasLasRelacionesDeUnELemento(T,G),
+								write('G4: '), write(G), nl,
+								transformaInicio(Q,V,B,U),
+								write('U4: '), write(U), nl,
+								append(U,G,Y),
+								write('Y4: '), write(Y), nl,
+								!.
+
+
+% Elimina una relación de una lista de realciones.
+quitaRelacion(X,[],Y):- Y = [], !.
+quitaRelacion(X,[H|T],Y):- primerTermino(X,Z), 
+								primerTermino(H,U), 
+								Z \= U,
+								quitaRelacion(X,T,G),
+								append([H],G,Y), !
+								;
+								primerTermino(X,Z),
+								primerTermino(H,U),
+								Z == U,
+								quitaRelacion(X,T,G),
+								Y = G,!.
+
+% Elimina las relaciones ya existentes de las nuevas.
+quitaRelacionesDePadresIgualsALasDeLosHijos([],W,Y):- Y = [].
+quitaRelacionesDePadresIgualsALasDeLosHijos(P,[],Y):- Y = P.
+quitaRelacionesDePadresIgualsALasDeLosHijos(W,[H|T],Y):-
+								write('W2: '), write(W), nl,
+								write('H2: '), write(H), nl,
+								write('T2: '), write(T), nl,
+								quitaRelacion(H,W,G),
+								write('G2: '), write(G), nl,
+								quitaRelacionesDePadresIgualsALasDeLosHijos(G,T,Y),
+								write('Y2: '), write(Y), nl.
+
+% Regresa las relaciones propias y Heredadas de un elemento (Id)
+relacionesPropiasYHeredadasDeUnElementoInicio(X,Y):- regresaTuplaPorNombreInicio(X,S),
+								regresaRelaciones(S,J),
+								J=[H|T],
+								regresaId_padre(S,I),
+								relacionesPropiasYHeredadasDeUnElemento(I,H,Y).
+relacionesPropiasYHeredadasDeUnElemento(X,W,Y):-
+								write('X1: '), write(X), nl,
+								write('W1: '), write(W), nl,
+								regresaTuplaPorIdInicio(X,S),
+								write('S1: '), write(S), nl,
+								regresaRelaciones(S,J),
+								write('J1: '), write(J), nl,
+								regresaId_padre(S,K),
+								write('K1: '), write(K), nl,
+								K \= c0,
+								J=[H|T],
+								write('H1: '), write(H), nl,
+								write('T1: '), write(T), nl,
+								quitaRelacionesDePadresIgualsALasDeLosHijos(H,W,N),
+								write('N1: '), write(N), nl,
+								append(W,N,F),
+								write('F1: '), write(F), nl,
+								relacionesPropiasYHeredadasDeUnElemento(K,F,Y),
+								write('Y1: '), write(Y), nl,!
+								;
+								Y = W,!.						
+
+% Intercambia Ids por nombres en una lista de relaciones.
+traduceRelacionesDeUnELemento([],Y):- Y = []. 
+traduceRelacionesDeUnELemento([H|T],Y):- primerTermino(H,P),
+								segundoTermino(H,S),
+								regresaTuplaPorIdInicio(S,M),
+								regresaNombre(M,J),
+								concat(P,'=>',D),
+								concat(D,J,A),
+								traduceRelacionesDeUnELemento(T,K),
+								append([A],K,Y),!.
+
+% uso esto para poder picarle w en swi-prolog para que me de todas las respuestas.
+ho(hom).
+ho(bar).
+h(Y):- ho(Y). 
+
+
+
+
+
+68 ?- buscaRelacionEnlistaDeRelacionesDeObjetosInicio(odia,Y).
+Y = ['hormiga atomica: odia=>viviparo', 'hormiga atomica: odia=>la mosca', 'hormiga atomica: odia=>mamifero', 'hormiga atomica: odia=>leon', 'hormiga atomica: odia=>simba', 'hormiga atomica: odia=>flipper', 'la mosca: odia=>oviparo', 'la mosca: odia=>hormiga atomica', 'la mosca: odia=>ave', 'la mosca: odia=>phoenix', 'la mosca: odia=>pato', 'la mosca: odia=>hugo', 'la mosca: odia=>paco', 'la mosca: odia=>luis', 'la mosca: odia=>pinguino', 'la mosca: odia=>pingu', 'la mosca: odia=>pez', 'la mosca: odia=>pez payaso', 'la mosca: odia=>nemo', 'phoenix: odia=>viviparo', 'phoenix: odia=>la mosca', 'phoenix: odia=>mamifero', 'phoenix: odia=>leon', 'phoenix: odia=>simba', 'phoenix: odia=>flipper', 'simba: odia=>paco', 'flipper: odia=>oviparo', 'flipper: odia=>hormiga atomica', 'flipper: odia=>ave', 'flipper: odia=>phoenix', 'flipper: odia=>pato', 'flipper: odia=>hugo', 'flipper: odia=>paco', 'flipper: odia=>luis', 'flipper: odia=>pinguino', 'flipper: odia=>pingu', 'flipper: odia=>pez', 'flipper: odia=>pez payaso', 'flipper: odia=>nemo', 'hugo: odia=>viviparo', 'hugo: odia=>la mosca', 'hugo: odia=>mamifero', 'hugo: odia=>leon', 'hugo: odia=>simba', 'hugo: odia=>flipper', 'paco: odia=>viviparo', 'paco: odia=>la mosca', 'paco: odia=>mamifero', 'paco: odia=>leon', 'paco: odia=>simba', 'paco: odia=>flipper', 'luis: odia=>viviparo', 'luis: odia=>la mosca', 'luis: odia=>mamifero', 'luis: odia=>leon', 'luis: odia=>simba', 'luis: odia=>flipper', 'pingu: odia=>viviparo', 'pingu: odia=>la mosca', 'pingu: odia=>mamifero', 'pingu: odia=>leon', 'pingu: odia=>simba', 'pingu: odia=>flipper'].
