@@ -39,9 +39,9 @@ cicloBasico(NumeroDeIndividuos,Tamano,NumeroDeAcciones,ProbabilidadDeCruzamiento
 mejor(PrimerIndividuo,SegundoIndividuo,MaximoIndividuo):-
 													PrimerIndividuo = [PrimerFitness|PrimerosGenes],
 													SegundoIndividuo = [SegundoFitness|SegundosGenes],
-													PF is PrimerFitness + 0,
-													SF is SegundoFitness + 0,
-													PF >= SF,
+													PrimerFitnessEvaluado is PrimerFitness + 0,
+													SegundoFitnessEvaluado is SegundoFitness + 0,
+													PrimerFitnessEvaluado >= SegundoFitnessEvaluado,
 													MaximoIndividuo = PrimerIndividuo,
 													!
 													;
@@ -57,8 +57,8 @@ generaPoblacionAleatoria(NumeroDeIndividuos,Tamano,NumeroDeAcciones,Poblacion):-
 													NumeritoDeIndividuos is NumeroDeIndividuos - 1,
 													generaPoblacionAleatoria(NumeritoDeIndividuos,Tamano,NumeroDeAcciones,PoblacionAnterior),
 													generaUNindividuoAleatorio(Tamano,NumeroDeAcciones,Individuo),
-													append([0],Individuo,IndividuoConFitnes),
-													append(PoblacionAnterior,[IndividuoConFitnes],Poblacion),
+													append([0],Individuo,IndividuoConFitness),
+													append(PoblacionAnterior,[IndividuoConFitness],Poblacion),
 													!.
 
 %% Esto van a generar un individuo aleatorio.
