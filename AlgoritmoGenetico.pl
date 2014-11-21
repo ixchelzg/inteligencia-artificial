@@ -168,3 +168,235 @@ split_at(N,[H|T],[H|L1],L2) :-
 ho(hom).
 ho(bar).
 h(Y):- ho(Y).
+
+% Esta función regresa toda la actividad posible del robot.
+
+% Esta función regresa una tabla con todas las acciones posibles.
+
+% Esta función regresa todos los movientos posibles.
+
+
+% 1a Regresa la extensión de una clase. 
+% La extensión de una clase (el conjunto de todos los objetos que pertenecen a la misma, ya sea porque se declaren directamente o porque están en la cerradura de la relación de herencia).
+% Ej.
+% ?- extensionDeUnaClaseInicio(ave,Y).
+% Y = [phoenix, hugo, paco, luis, pingu].
+
+% Regresa todos los objetos hijos directos o indirectos de una clase dada.
+extensionDeUnaClaseInicio(X,Y):- rb(W), 
+								regresaTuplaPorNombre(X,W,S), 
+								regresaId(S,L), 
+								extensionDeUnaClase(L,W,Y),!.
+extensionDeUnaClase(X,[],Y):- Y = [].
+extensionDeUnaClase(X,[H|T],Y):- 
+								regresaId_padre(H,S), 
+								X==S,
+								regresaNombre(H,N),
+								regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'c',
+								extensionDeUnaClaseInicio(N,P),
+								extensionDeUnaClase(X,T,R), 
+								append(P,R,Y),!
+								;
+								regresaId_padre(H,S), 
+								X==S,
+								regresaNombre(H,N),
+								regresaId(H,I), 
+								string_chars(I,J), 
+								J=[C|V], 
+								C == 'o',
+								extensionDeUnaClase(X,T,R), 
+								append([N],R,Y),!
+								; 
+								extensionDeUnaClase(X,T,Y),!.
+
+
+
+% Aqui tengo la base 
+rb(Y):- Y = [
+	[
+		id=>c1,
+		id_padre=>c0,
+		[nombre=>robot],
+		[ubicacion=>o5]
+	],
+	[
+		id=>o2,
+		id_padre=>c1,
+		[
+		nombre=>brazoIzquierdo,
+		],
+		[]
+	],
+	[
+		id=>o3,
+		id_padre=>c1,
+		[
+		nombre=>brazoDerecho,
+		],
+		[]
+	],
+	[
+		id=>c4,
+		id_padre=>c0,
+		[nombre=>lugares],
+		[]
+	],
+	[
+		id=>o5,
+		id_padre=>c4,
+		[nombre=>inicio],
+		[movimiento=>[
+			[descripcion=>o5,probabilidad=>1.00,costo=>0.0,recompensa=>0.0],
+			[descripcion=>o6,probabilidad=>0.98,costo=>6.0,recompensa=>0.0],
+			[descripcion=>o7,probabilidad=>0.98,costo=>8.0,recompensa=>0.0],
+			[descripcion=>o8,probabilidad=>0.98,costo=>9.0,recompensa=>0.0],
+			[descripcion=>o9,probabilidad=>0.98,costo=>10.0,recompensa=>0.0],
+			[descripcion=>o10,probabilidad=>0.98,costo=>9.0,recompensa=>0.0]             
+			]
+		]
+	],
+	[
+		id=>o6,
+		id_padre=>c4,
+		[nombre=>estante1],
+		[movimiento=>[
+			[descripcion=>o5,probabilidad=>0.98,costo=>6.0,recompensa=>0.0],
+			[descripcion=>o6,probabilidad=>1.00,costo=>0.0,recompensa=>0.0],
+			[descripcion=>o7,probabilidad=>0.97,costo=>12.0,recompensa=>0.0],
+			[descripcion=>o8,probabilidad=>0.97,costo=>15.0,recompensa=>0.0],
+			[descripcion=>o9,probabilidad=>0.96,costo=>16.0,recompensa=>0.0],
+			[descripcion=>o10,probabilidad=>0.97,costo=>12.0,recompensa=>0.0]             
+			]
+		]
+	],
+	[
+		id=>o7,
+		id_padre=>c4,
+		[nombre=>estante2],
+		[movimiento=>[
+			[descripcion=>o5,probabilidad=>0.98,costo=>8.0,recompensa=>0.0],
+			[descripcion=>o6,probabilidad=>0.97,costo=>12.0,recompensa=>0.0],
+			[descripcion=>o7,probabilidad=>1.00,costo=>0.0,recompensa=>0.0],
+			[descripcion=>o8,probabilidad=>0.98,costo=>6.0,recompensa=>0.0],
+			[descripcion=>o9,probabilidad=>0.98,costo=>8.0,recompensa=>0.0],
+			[descripcion=>o10,probabilidad=>0.96,costo=>16.0,recompensa=>0.0]             
+			]
+		]
+	],
+	[
+		id=>o8,
+		id_padre=>c4,
+		[nombre=>mesa1],
+		[movimiento=>[
+			[descripcion=>o5,probabilidad=>0.98,costo=>9.0,recompensa=>0.0],
+			[descripcion=>o6,probabilidad=>0.97,costo=>15.0,recompensa=>0.0],
+			[descripcion=>o7,probabilidad=>0.98,costo=>6.0,recompensa=>0.0],
+			[descripcion=>o8,probabilidad=>1.00,costo=>0.0,recompensa=>0.0],
+			[descripcion=>o9,probabilidad=>0.99,costo=>2.0,recompensa=>0.0],
+			[descripcion=>o10,probabilidad=>0.97,costo=>13.0,recompensa=>0.0]             
+			]
+		]
+	],
+	[
+		id=>o9,
+		id_padre=>c4,
+		[nombre=>mesa2],
+		[movimiento=>[
+			[descripcion=>o5,probabilidad=>0.98,costo=>10.0,recompensa=>0.0],
+			[descripcion=>o6,probabilidad=>0.96,costo=>16.0,recompensa=>0.0],
+			[descripcion=>o7,probabilidad=>0.98,costo=>8.0,recompensa=>0.0],
+			[descripcion=>o8,probabilidad=>0.99,costo=>2.0,recompensa=>0.0],
+			[descripcion=>o9,probabilidad=>1.00,costo=>0.0,recompensa=>0.0],
+			[descripcion=>o10,probabilidad=>0.97,costo=>12.0,recompensa=>0.0]             
+			]
+		]
+	],
+	[
+		id=>o10,
+		id_padre=>c4,
+		[nombre=>mesa3],
+		[movimiento=>[
+			[descripcion=>o5,probabilidad=>0.98,costo=>9.0,recompensa=>0.0],
+			[descripcion=>o6,probabilidad=>0.97,costo=>12.0,recompensa=>0.0],
+			[descripcion=>o7,probabilidad=>0.96,costo=>16.0,recompensa=>0.0],
+			[descripcion=>o8,probabilidad=>0.97,costo=>13.0,recompensa=>0.0],
+			[descripcion=>o9,probabilidad=>0.97,costo=>12.0,recompensa=>0.0],
+			[descripcion=>o10,probabilidad=>1.00,costo=>0.0,recompensa=>0.0]             
+			]
+		]
+	],
+	[
+		id=>c11,
+		id_padre=>c0,
+		[nombre=>cosas],
+		[]
+	],
+	[
+		id=>o12,
+		id_padre=>c11,
+		[
+			nombre=>hamburguesa,
+			acciones=>[
+				[descripcion=>buscar,probabilidad=>0.95,costo=>5.0,recompensa=>50.0],
+				[descripcion=>agarrar,probabilidad=>0.90,costo=>8.0,recompensa=>100.0],
+				[descripcion=>entregar,probabilidad=>0.99,costo=>5.0,recompensa=>300.0]
+			]
+		],
+		[ubicacion=>o6]
+	],
+	[
+		id=>o13,
+		id_padre=>c11,
+		[
+			nombre=>sandwich,
+			acciones=>[
+				[descripcion=>buscar,probabilidad=>0.80,costo=>5.0,recompensa=>50.0],
+				[descripcion=>agarrar,probabilidad=>0.85,costo=>9.0,recompensa=>100.0],
+				[descripcion=>entregar,probabilidad=>0.99,costo=>5.0,recompensa=>300.0]
+			]
+		],
+		[ubicacion=>o6]
+	],
+	[
+		id=>o14,
+		id_padre=>c11,
+		[
+			nombre=>refresco,
+			acciones=>[
+				[descripcion=>buscar,probabilidad=>0.96,costo=>2.0,recompensa=>50.0],
+				[descripcion=>agarrar,probabilidad=>0.95,costo=>2.0,recompensa=>80.0],
+				[descripcion=>entregar,probabilidad=>0.99,costo=>3.0,recompensa=>300.0]
+			]
+		],
+		[ubicacion=>o7]
+	],
+	[
+		id=>o15,
+		id_padre=>c11,
+		[
+			nombre=>agua,
+			acciones=>[
+				[descripcion=>buscar,probabilidad=>0.70,costo=>15.0,recompensa=>50.0],
+				[descripcion=>agarrar,probabilidad=>0.95,costo=>10.0,recompensa=>80.0],
+				[descripcion=>entregar,probabilidad=>0.99,costo=>10.0,recompensa=>300.0]
+			]
+		],
+		[ubicacion=>o7]
+	],
+	[
+		id=>o16,
+		id_padre=>c11,
+		[
+			nombre=>cafe,
+			acciones=>[
+				[descripcion=>buscar,probabilidad=>0.85,costo=>10.0,recompensa=>50.0],
+				[descripcion=>agarrar,probabilidad=>0.70,costo=>20.0,recompensa=>15.0],
+				[descripcion=>entregar,probabilidad=>0.85,costo=>20.0,recompensa=>400.0]
+			]
+		],
+		[ubicacion=>o7]
+	]
+].
